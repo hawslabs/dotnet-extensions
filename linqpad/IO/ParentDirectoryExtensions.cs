@@ -4,7 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 
 public static class ParentDirectoryExtensions {
 	extension(DirectoryInfo directory) {
-		DirectoryInfo GetParentDirectory(int levels = 1) {
+		public DirectoryInfo GetParentDirectory(int levels = 1) {
 			if (!directory.TryGetParentDirectory(levels, out var parentDirectory)) {
 				throw new DirectoryNotFoundException(
 					$"Path '{directory.FullName}' does not have {levels} parent directories."
@@ -14,13 +14,13 @@ public static class ParentDirectoryExtensions {
 			return parentDirectory;
 		}
 
-		DirectoryInfo GetParentDirectoryOrRoot(int levels = 1) {
+		public DirectoryInfo GetParentDirectoryOrRoot(int levels = 1) {
 			return directory.TryGetParentDirectory(levels, out var parentDirectory)
 				? parentDirectory
 				: directory.Root;
 		}
 
-		bool TryGetParentDirectory(
+		public bool TryGetParentDirectory(
 			int levels,
 			[NotNullWhen(true)] out DirectoryInfo? parentDirectory
 		) {

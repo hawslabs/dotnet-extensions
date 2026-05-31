@@ -1,52 +1,66 @@
-namespace HawsLabs.Extensions.LINQPad.IO;
+﻿namespace HawsLabs.Extensions.LINQPad.IO;
+
+using System.Collections.Generic;
 
 using Microsoft.Extensions.FileSystemGlobbing;
 using Microsoft.Extensions.FileSystemGlobbing.Abstractions;
 
-public static class FileTree {
-	public static IEnumerable<FileInfo> EnumerateFiles(
-		string basePath,
-		IEnumerable<string> includePatterns,
-		IEnumerable<string> excludePatterns,
-		FileEnumerationOptions? options = null) {
-		options ??= new FileEnumerationOptions();
+public sealed record EnumerateFilesOptions {
+	public bool EnsureBasePathExists { get; init; } = true;
+	public bool SortResults { get; init; } = true;
+	public StringComparer ResultSortComparer { get; init; } = StringComparer.OrdinalIgnoreCase;
+	public StringComparison PatternComparison { get; init; } = StringComparison.OrdinalIgnoreCase;
+	public bool ExpandBracePatterns { get; init; } = true;
+	public bool TreatBareExcludeAsDirectoryName { get; init; } = true;
+}
 
-		var fullBasePath = Path.GetFullPath(basePath);
+public static class EnumerateFilesExtensions {
+	extension(DirectoryInfo directory) {
+		public IEnumerable<FileInfo> EnumerateFiles(
+			string[] includePatterns,
+			string[] excludePatterns,
+			EnumerateFilesOptions? options = null
+		) {
+			options ??= new EnumerateFilesOptions();
 
-		if (options.EnsureBasePathExists && !Directory.Exists(fullBasePath)) {
-			throw new DirectoryNotFoundException($"Base path does not exist: {fullBasePath}");
+			var fullBasePath = directory.FullName;
+
+			if (options.EnsureBasePathExists && !Directory.Exists(fullBasePath)) {
+				throw new DirectoryNotFoundException($"Base path does not exist: {fullBasePath}");
+			}
+
+			var matcher = new Matcher(options.PatternComparison);
+
+			var includes = NormalizeIncludePatterns(includePatterns, options).ToList();
+			if (includes.Count == 0) {
+				includes.Add("**/*");
+			}
+
+			foreach (var include in includes) {
+				matcher.AddInclude(include);
+			}
+
+			foreach (var exclude in NormalizeExcludePatterns(excludePatterns, options)) {
+				matcher.AddExclude(exclude);
+			}
+
+			var result = matcher.Execute(new DirectoryInfoWrapper(new DirectoryInfo(fullBasePath)));
+
+			var filePaths = result.Files
+				.Select(match => Path.GetFullPath(Path.Combine(fullBasePath, match.Path)));
+
+			if (options.SortResults) {
+				filePaths = filePaths.OrderBy(path => path, options.ResultSortComparer);
+			}
+
+			return filePaths.Select(path => new FileInfo(path));
 		}
-
-		var matcher = new Matcher(options.PatternComparison);
-
-		var includes = NormalizeIncludePatterns(includePatterns, options).ToList();
-		if (includes.Count == 0) {
-			includes.Add("**/*");
-		}
-
-		foreach (var include in includes) {
-			matcher.AddInclude(include);
-		}
-
-		foreach (var exclude in NormalizeExcludePatterns(excludePatterns, options)) {
-			matcher.AddExclude(exclude);
-		}
-
-		var result = matcher.Execute(new DirectoryInfoWrapper(new DirectoryInfo(fullBasePath)));
-
-		var filePaths = result.Files
-			.Select(match => Path.GetFullPath(Path.Combine(fullBasePath, match.Path)));
-
-		if (options.SortResults) {
-			filePaths = filePaths.OrderBy(path => path, options.ResultSortComparer);
-		}
-
-		return filePaths.Select(path => new FileInfo(path));
 	}
 
 	private static IEnumerable<string> NormalizeIncludePatterns(
 		IEnumerable<string> patterns,
-		FileEnumerationOptions options) {
+		EnumerateFilesOptions options
+	) {
 		foreach (var pattern in ExpandPatterns(patterns, options)) {
 			yield return NormalizePattern(pattern);
 		}
@@ -54,7 +68,7 @@ public static class FileTree {
 
 	private static IEnumerable<string> NormalizeExcludePatterns(
 		IEnumerable<string> patterns,
-		FileEnumerationOptions options
+		EnumerateFilesOptions options
 	) {
 		foreach (var rawPattern in ExpandPatterns(patterns, options)) {
 			var pattern = NormalizePattern(rawPattern);
@@ -78,7 +92,7 @@ public static class FileTree {
 
 	private static IEnumerable<string> ExpandPatterns(
 		IEnumerable<string> patterns,
-		FileEnumerationOptions options) {
+		EnumerateFilesOptions options) {
 		foreach (var pattern in patterns.Where(p => !string.IsNullOrWhiteSpace(p))) {
 			var normalized = NormalizePattern(pattern);
 
