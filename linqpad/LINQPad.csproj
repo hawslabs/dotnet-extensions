@@ -7,6 +7,10 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <PackageReference Include="HawsLabs.Analyzers">
+	    <PrivateAssets>all</PrivateAssets>
+	    <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+	  </PackageReference>
 	  <PackageReference Include="LINQPad.Runtime" />
 	  <PackageReference Include="Microsoft.Extensions.FileSystemGlobbing" />
 	</ItemGroup>

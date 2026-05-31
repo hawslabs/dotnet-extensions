@@ -3,8 +3,8 @@
     <!-- Enable central package management, https://learn.microsoft.com/en-us/nuget/consume-packages/Central-Package-Management -->
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
-
   <ItemGroup>
+    <PackageVersion Include="HawsLabs.Analyzers" Version="26.526.143640" />
     <PackageVersion Include="LINQPad.Runtime" Version="8.3.7" />
     <PackageVersion Include="Microsoft.Extensions.FileSystemGlobbing" Version="10.0.0" />
   </ItemGroup>

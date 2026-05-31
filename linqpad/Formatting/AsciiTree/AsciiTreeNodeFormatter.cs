@@ -1,23 +1,14 @@
 using HawsLabs.Extensions.LINQPad.Trees;
 
-namespace HawsLabs.Extensions.LINQPad.Formatting;
+namespace HawsLabs.Extensions.LINQPad.Formatting.AsciiTree;
 
-public sealed class AsciiTreeNodeFormatter : ITreeNodeFormatter
-{
-    private readonly AsciiTreeNodeFormatterOptions _options;
+public sealed class AsciiTreeNodeFormatter(
+    AsciiTreeNodeFormatterOptions? options = null
+) : ITreeNodeFormatter {
+    private readonly AsciiTreeNodeFormatterOptions _options
+        = options ?? new AsciiTreeNodeFormatterOptions();
 
-    public AsciiTreeNodeFormatter()
-        : this(null)
-    {
-    }
-
-    public AsciiTreeNodeFormatter(AsciiTreeNodeFormatterOptions? options)
-    {
-        _options = options ?? new AsciiTreeNodeFormatterOptions();
-    }
-
-    public string Format(TreeNode root)
-    {
+    public string Format(TreeNode root) {
         ArgumentNullException.ThrowIfNull(root);
 
         var maxNameColumnWidth = GetRootLeftText(root).Length;
@@ -52,12 +43,10 @@ public sealed class AsciiTreeNodeFormatter : ITreeNodeFormatter
         TreeNode node,
         string indent,
         ref int maxNameColumnWidth,
-        ref int maxLineColumnWidth)
-    {
+        ref int maxLineColumnWidth) {
         var children = GetSortedChildren(node);
 
-        foreach (var child in children)
-        {
+        foreach (var child in children) {
             var connector = "├── ";
             var icon = GetIcon(child);
             var leftText = indent + connector + icon + child.Name;
@@ -75,12 +64,10 @@ public sealed class AsciiTreeNodeFormatter : ITreeNodeFormatter
         TreeNode node,
         string indent,
         int maxNameColumnWidth,
-        int maxLineColumnWidth)
-    {
+        int maxLineColumnWidth) {
         var children = GetSortedChildren(node);
 
-        for (var i = 0; i < children.Count; i++)
-        {
+        for (var i = 0; i < children.Count; i++) {
             var child = children[i];
             var isLast = i == children.Count - 1;
 
@@ -109,25 +96,20 @@ public sealed class AsciiTreeNodeFormatter : ITreeNodeFormatter
         int labelCount,
         int maxNameColumnWidth,
         int maxLineColumnWidth,
-        bool forceShowLabel)
-    {
+        bool forceShowLabel) {
         var lineText = FormatNumber(lineCount);
 
-        if (_options.AlignColumns)
-        {
+        if (_options.AlignColumns) {
             sb.Append(leftText.PadRight(maxNameColumnWidth));
             sb.Append(_options.ColumnSeparator);
             sb.Append(lineText.PadLeft(maxLineColumnWidth));
-        }
-        else
-        {
+        } else {
             sb.Append(leftText);
             sb.Append(_options.ColumnSeparator);
             sb.Append(lineText);
         }
 
-        if (_options.ShowLabels && (forceShowLabel || labelCount > 0 || _options.ShowZeroLabelCounts))
-        {
+        if (_options.ShowLabels && (forceShowLabel || labelCount > 0 || _options.ShowZeroLabelCounts)) {
             sb.Append(_options.LabelSeparator);
             sb.Append(_options.LabelIcon);
             sb.Append(labelCount.ToString(_options.NumberFormat, _options.Culture));
@@ -136,10 +118,8 @@ public sealed class AsciiTreeNodeFormatter : ITreeNodeFormatter
         sb.AppendLine();
     }
 
-    private IReadOnlyList<TreeNode> GetSortedChildren(TreeNode node)
-    {
-        return _options.SortOrder switch
-        {
+    private IReadOnlyList<TreeNode> GetSortedChildren(TreeNode node) {
+        return _options.SortOrder switch {
             TreeSortOrder.LinesOfCodeDesc => node.Children.Values
                 .OrderByDescending(GetDisplayLineCount)
                 .ThenBy(child => child.Name, _options.NameComparer)
@@ -156,39 +136,35 @@ public sealed class AsciiTreeNodeFormatter : ITreeNodeFormatter
         };
     }
 
-    private string GetRootLeftText(TreeNode root)
-    {
+    private string GetRootLeftText(TreeNode root) {
         return _options.ShowIcons
             ? _options.DirectoryIcon + root.Name
             : root.Name;
     }
 
-    private string GetIcon(TreeNode node)
-    {
-        if (!_options.ShowIcons)
+    private string GetIcon(TreeNode node) {
+        if (!_options.ShowIcons) {
             return "";
+        }
 
         return node.IsFile
             ? _options.FileIcon
             : _options.DirectoryIcon;
     }
 
-    private int GetDisplayLineCount(TreeNode node)
-    {
+    private int GetDisplayLineCount(TreeNode node) {
         return node.IsFile
             ? node.LineCount
             : node.TotalLines;
     }
 
-    private int GetDisplayLabelCount(TreeNode node)
-    {
+    private int GetDisplayLabelCount(TreeNode node) {
         return node.IsFile
             ? node.LabelCount
             : node.TotalLabelCount;
     }
 
-    private string FormatNumber(int value)
-    {
+    private string FormatNumber(int value) {
         return value.ToString(_options.NumberFormat, _options.Culture);
     }
 }
