@@ -8,35 +8,22 @@
 </Query>
 
 void Main() {
-	var solutionDirectory = new FileInfo(Util.CurrentScriptPath)
-		.Directory
-		?.GetParentDirectoryOrRoot(
-			levels: 2
-		)
-		.Dump("SolutionDirectory");
-		
-	if (solutionDirectory is null) {
-		return;
-	}
-		
-	solutionDirectory
-		.Glob(
-			includePatterns: [
-				"**/*.{csproj,sln,slnx,props,targets}",
-				"**/*.{cs,json}",
-			],
-			excludePatterns: [
-				".git",
-				"**/*.Designer.cs",
-				"**/*DbContextModelSnapshot.cs",
-				"**/node_modules/",
-				"**/{artifacts,.artifacts,obj,bin,.vs}/",
-			]
-		)
-		.DumpAsAsciiTree(solutionDirectory.FullName, new() {
-			SortOrder = TreeSortOrder.Alphabetical,
-			ShowIcons = true,
-			ShowLabels = false,
-			AlignColumns = true,
-		});
+	Util.GitRootDirectory?.Glob(
+		includePatterns: [
+			"**/*.{csproj,sln,slnx,props,targets}",
+			"**/*.{cs,json}",
+		],
+		excludePatterns: [
+			".git",
+			"**/*.Designer.cs",
+			"**/*DbContextModelSnapshot.cs",
+			"**/node_modules/",
+			"**/{artifacts,.artifacts,obj,bin,.vs}/",
+		]
+	).DumpAsAsciiTree(Util.GitRootDirectory!.FullName, new() {
+		SortOrder = TreeSortOrder.Alphabetical,
+		ShowIcons = true,
+		ShowLabels = false,
+		AlignColumns = true,
+	});
 }
