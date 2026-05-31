@@ -29,28 +29,25 @@ public sealed class TreeNode {
 		Children = new OrderedTreeNodeDictionary(childNameComparer);
 	}
 
-	public static TreeNode Parse(IEnumerable<string> filePaths) {
-		return Parse(filePaths, null);
+	public static TreeNode Parse(IEnumerable<FileInfo> files) {
+		return Parse(files, null);
 	}
 
-	public static TreeNode Parse(IEnumerable<string> filePaths, TreeNodeParseOptions? options) {
+	public static TreeNode Parse(IEnumerable<FileInfo> files, TreeNodeParseOptions? options) {
 		options ??= new TreeNodeParseOptions();
 
-		var paths = filePaths
-			.Select(Path.GetFullPath)
-			.ToList();
 
 		if (options.SortInputPaths) {
-			paths = paths.OrderBy(path => path, options.PathSortComparer).ToList();
+			files = files.OrderBy(file => file.FullName, options.PathSortComparer).ToList();
 		}
 
-		var basePath = Path.GetFullPath(options.BasePath ?? FindCommonBasePath(paths, options.PathComparison));
+		var basePath = Path.GetFullPath(options.BasePath ?? FindCommonBasePath(files, options.PathComparison));
 		var rootName = options.RootName ?? GetDefaultRootName(basePath);
 
 		var root = new TreeNode(rootName, options.ChildNameComparer);
 
-		foreach (var fullPath in paths) {
-			var relativePath = Path.GetRelativePath(basePath, fullPath).Replace('\\', '/');
+		foreach (var file in files) {
+			var relativePath = Path.GetRelativePath(basePath, file.FullName).Replace('\\', '/');
 
 			if (options.IgnoreFilesOutsideBasePath && IsOutsideBasePath(relativePath)) {
 				continue;
@@ -68,10 +65,10 @@ public sealed class TreeNode {
 			}
 
 			var metrics = options.ReadFileMetrics
-				? ReadMetrics(fullPath, options)
+				? ReadMetrics(file.FullName, options)
 				: new FileMetrics(0, 0);
 
-			node.SetFileMetrics(fullPath, metrics.LineCount, metrics.LabelCount);
+			node.SetFileMetrics(file.FullName, metrics.LineCount, metrics.LabelCount);
 		}
 
 		root.ComputeTotals();
@@ -133,15 +130,15 @@ public sealed class TreeNode {
 			|| Path.IsPathRooted(relativePath);
 	}
 
-	private static string FindCommonBasePath(IReadOnlyList<string> paths, StringComparison comparison) {
-		if (paths.Count == 0) {
+	private static string FindCommonBasePath(IEnumerable<FileInfo> files, StringComparison comparison) {
+		if (!files.Any()) {
 			return Directory.GetCurrentDirectory();
 		}
 
-		var common = Path.GetDirectoryName(paths[0]) ?? Directory.GetCurrentDirectory();
+		var common = Path.GetDirectoryName(files.First().FullName) ?? Directory.GetCurrentDirectory();
 
-		foreach (var path in paths.Skip(1)) {
-			var directory = Path.GetDirectoryName(path) ?? Directory.GetCurrentDirectory();
+		foreach (var file in files.Skip(1)) {
+			var directory = Path.GetDirectoryName(file.FullName) ?? Directory.GetCurrentDirectory();
 
 			while (!IsSameOrChildPath(directory, common, comparison)) {
 				var parent = Directory.GetParent(common);

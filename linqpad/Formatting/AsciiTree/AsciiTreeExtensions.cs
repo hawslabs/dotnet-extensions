@@ -3,7 +3,7 @@
 using HawsLabs.Extensions.LINQPad.Trees;
 
 public static class AsciiTreeExtensions {
-	extension(IEnumerable<string> paths) {
+	extension(IEnumerable<FileInfo> paths) {
 		public string ToAsciiTree(string basePath, AsciiTreeNodeFormatterOptions? options = null) {
 			options ??= new AsciiTreeNodeFormatterOptions {
 				SortOrder = TreeSortOrder.Alphabetical,
