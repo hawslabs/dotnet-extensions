@@ -24,6 +24,7 @@ void Main() {
 		SortOrder = TreeSortOrder.Alphabetical,
 		ShowIcons = true,
 		ShowLabels = false,
+		ShowLineCounts = false,
 		AlignColumns = true,
 	});
 }

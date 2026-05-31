@@ -12,7 +12,9 @@ public sealed class AsciiTreeNodeFormatter(
 		ArgumentNullException.ThrowIfNull(root);
 
 		var maxNameColumnWidth = GetRootLeftText(root).Length;
-		var maxLineColumnWidth = FormatNumber(root.TotalLines).Length;
+		var maxLineColumnWidth = _options.ShowLineCounts
+			? FormatNumber(root.TotalLines).Length
+			: 0;
 
 		Measure(root, indent: "", ref maxNameColumnWidth, ref maxLineColumnWidth);
 
@@ -43,17 +45,21 @@ public sealed class AsciiTreeNodeFormatter(
 		TreeNode node,
 		string indent,
 		ref int maxNameColumnWidth,
-		ref int maxLineColumnWidth) {
+		ref int maxLineColumnWidth
+	) {
 		var children = GetSortedChildren(node);
 
 		foreach (var child in children) {
 			var connector = "├── ";
 			var icon = GetIcon(child);
 			var leftText = indent + connector + icon + child.Name;
-			var lineText = FormatNumber(GetDisplayLineCount(child));
 
 			maxNameColumnWidth = Math.Max(maxNameColumnWidth, leftText.Length);
-			maxLineColumnWidth = Math.Max(maxLineColumnWidth, lineText.Length);
+
+			if (_options.ShowLineCounts) {
+				var lineText = FormatNumber(GetDisplayLineCount(child));
+				maxLineColumnWidth = Math.Max(maxLineColumnWidth, lineText.Length);
+			}
 
 			Measure(child, indent + "    ", ref maxNameColumnWidth, ref maxLineColumnWidth);
 		}
@@ -64,7 +70,8 @@ public sealed class AsciiTreeNodeFormatter(
 		TreeNode node,
 		string indent,
 		int maxNameColumnWidth,
-		int maxLineColumnWidth) {
+		int maxLineColumnWidth
+	) {
 		var children = GetSortedChildren(node);
 
 		for (var i = 0; i < children.Count; i++) {
@@ -96,20 +103,29 @@ public sealed class AsciiTreeNodeFormatter(
 		int labelCount,
 		int maxNameColumnWidth,
 		int maxLineColumnWidth,
-		bool forceShowLabel) {
-		var lineText = FormatNumber(lineCount);
+		bool forceShowLabel
+	) {
+		var showLabel = _options.ShowLabels && (forceShowLabel || labelCount > 0 || _options.ShowZeroLabelCounts);
 
-		if (_options.AlignColumns) {
+		if (_options.ShowLineCounts) {
+			var lineText = FormatNumber(lineCount);
+
+			if (_options.AlignColumns) {
+				sb.Append(leftText.PadRight(maxNameColumnWidth));
+				sb.Append(_options.ColumnSeparator);
+				sb.Append(lineText.PadLeft(maxLineColumnWidth));
+			} else {
+				sb.Append(leftText);
+				sb.Append(_options.ColumnSeparator);
+				sb.Append(lineText);
+			}
+		} else if (_options.AlignColumns && showLabel) {
 			sb.Append(leftText.PadRight(maxNameColumnWidth));
-			sb.Append(_options.ColumnSeparator);
-			sb.Append(lineText.PadLeft(maxLineColumnWidth));
 		} else {
 			sb.Append(leftText);
-			sb.Append(_options.ColumnSeparator);
-			sb.Append(lineText);
 		}
 
-		if (_options.ShowLabels && (forceShowLabel || labelCount > 0 || _options.ShowZeroLabelCounts)) {
+		if (showLabel) {
 			sb.Append(_options.LabelSeparator);
 			sb.Append(_options.LabelIcon);
 			sb.Append(labelCount.ToString(_options.NumberFormat, _options.Culture));

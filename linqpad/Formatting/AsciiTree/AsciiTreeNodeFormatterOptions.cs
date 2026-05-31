@@ -5,6 +5,7 @@ public sealed record AsciiTreeNodeFormatterOptions {
 	public StringComparer NameComparer { get; init; } = StringComparer.OrdinalIgnoreCase;
 	public bool AlignColumns { get; init; } = true;
 	public bool ShowIcons { get; init; } = true;
+	public bool ShowLineCounts { get; init; } = true;
 	public bool ShowLabels { get; init; } = false;
 	public bool ShowZeroLabelCounts { get; init; } = false;
 	public string DirectoryIcon { get; init; } = "📁";
