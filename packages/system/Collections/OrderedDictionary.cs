@@ -1,13 +1,10 @@
 namespace System.Collections;
 
-public sealed class OrderedDictionary<TKey, TValue> : IEnumerable<KeyValuePair<TKey, TValue>>
-	where TKey : notnull {
-	private readonly List<KeyValuePair<TKey, TValue>> _list = new();
-	private readonly Dictionary<TKey, int> _index;
-
-	public OrderedDictionary(IEqualityComparer<TKey> comparer) {
-		_index = new Dictionary<TKey, int>(comparer);
-	}
+public sealed class OrderedDictionary<TKey, TValue>(
+	IEqualityComparer<TKey> comparer
+) : IEnumerable<KeyValuePair<TKey, TValue>> where TKey : notnull {
+	private readonly List<KeyValuePair<TKey, TValue>> _list = [];
+	private readonly Dictionary<TKey, int> _index = new(comparer);
 
 	public TValue this[TKey key] {
 		get => _list[_index[key]].Value;
