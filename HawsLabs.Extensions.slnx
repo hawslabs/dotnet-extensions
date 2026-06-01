@@ -6,5 +6,6 @@
     <File Path="Directory.Build.props" />
     <File Path="Directory.Packages.props" />
   </Folder>
-  <Project Path="linqpad/LINQPad.csproj" />
+  <Project Path="packages/linqpad/HawsLabs.Extensions.LINQPad.csproj" />
+  <Project Path="packages/system/HawsLabs.Extensions.System.csproj" />
 </Solution>

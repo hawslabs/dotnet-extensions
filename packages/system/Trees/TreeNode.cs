@@ -1,8 +1,8 @@
-namespace HawsLabs.Extensions.LINQPad.Trees;
+namespace System.Trees;
 
-using HawsLabs.Extensions.LINQPad.Formatting;
+using Formatting;
 
-using OrderedTreeNodeDictionary = HawsLabs.Extensions.LINQPad.Collections.OrderedDictionary<string, HawsLabs.Extensions.LINQPad.Trees.TreeNode>;
+using OrderedTreeNodeDictionary = Collections.OrderedDictionary<string, TreeNode>;
 
 public sealed class TreeNode {
 	private readonly IEqualityComparer<string> _childNameComparer;
@@ -35,7 +35,6 @@ public sealed class TreeNode {
 
 	public static TreeNode Parse(IEnumerable<FileInfo> files, TreeNodeParseOptions? options) {
 		options ??= new TreeNodeParseOptions();
-
 
 		if (options.SortInputPaths) {
 			files = files.OrderBy(file => file.FullName, options.PathSortComparer).ToList();

@@ -1,6 +1,6 @@
-﻿namespace System.IO;
+namespace System.IO;
 
-using System.Diagnostics.CodeAnalysis;
+using Diagnostics.CodeAnalysis;
 
 public static class ParentDirectoryExtensions {
 	extension(DirectoryInfo directory) {

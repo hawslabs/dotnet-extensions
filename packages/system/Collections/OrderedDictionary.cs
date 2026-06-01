@@ -1,4 +1,4 @@
-namespace HawsLabs.Extensions.LINQPad.Collections;
+namespace System.Collections;
 
 public sealed class OrderedDictionary<TKey, TValue> : IEnumerable<KeyValuePair<TKey, TValue>>
 	where TKey : notnull {
@@ -38,7 +38,7 @@ public sealed class OrderedDictionary<TKey, TValue> : IEnumerable<KeyValuePair<T
 		return _list.GetEnumerator();
 	}
 
-	System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() {
+	IEnumerator IEnumerable.GetEnumerator() {
 		return GetEnumerator();
 	}
 }

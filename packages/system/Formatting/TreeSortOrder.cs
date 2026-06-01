@@ -1,7 +1,8 @@
-namespace HawsLabs.Extensions.LINQPad.Formatting;
+namespace System.Formatting;
 
 public enum TreeSortOrder {
 	Alphabetical,
+	AlphabeticalDirectoriesFirst,
 	LinesOfCodeDesc,
 	LabelCountDesc
 }

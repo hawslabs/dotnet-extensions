@@ -1,6 +1,4 @@
-namespace HawsLabs.Extensions.LINQPad.Formatting.AsciiTree;
-
-using HawsLabs.Extensions.LINQPad.Trees;
+namespace System.Formatting.AsciiTree;
 
 public sealed class AsciiTreeNodeFormatter(
 	AsciiTreeNodeFormatterOptions? options = null
@@ -8,7 +6,7 @@ public sealed class AsciiTreeNodeFormatter(
 	private readonly AsciiTreeNodeFormatterOptions _options
 		= options ?? new AsciiTreeNodeFormatterOptions();
 
-	public string Format(TreeNode root) {
+	public string Format(Trees.TreeNode root) {
 		ArgumentNullException.ThrowIfNull(root);
 
 		var maxNameColumnWidth = GetRootLeftText(root).Length;
@@ -42,7 +40,7 @@ public sealed class AsciiTreeNodeFormatter(
 	}
 
 	private void Measure(
-		TreeNode node,
+		Trees.TreeNode node,
 		string indent,
 		ref int maxNameColumnWidth,
 		ref int maxLineColumnWidth
@@ -67,7 +65,7 @@ public sealed class AsciiTreeNodeFormatter(
 
 	private void RenderChildren(
 		StringBuilder sb,
-		TreeNode node,
+		Trees.TreeNode node,
 		string indent,
 		int maxNameColumnWidth,
 		int maxLineColumnWidth
@@ -134,8 +132,13 @@ public sealed class AsciiTreeNodeFormatter(
 		sb.AppendLine();
 	}
 
-	private IReadOnlyList<TreeNode> GetSortedChildren(TreeNode node) {
+	private IReadOnlyList<Trees.TreeNode> GetSortedChildren(Trees.TreeNode node) {
 		return _options.SortOrder switch {
+			TreeSortOrder.AlphabeticalDirectoriesFirst => node.Children.Values
+				.OrderBy(child => child.IsFile)
+				.ThenBy(child => child.Name, _options.NameComparer)
+				.ToList(),
+
 			TreeSortOrder.LinesOfCodeDesc => node.Children.Values
 				.OrderByDescending(GetDisplayLineCount)
 				.ThenBy(child => child.Name, _options.NameComparer)
@@ -152,13 +155,13 @@ public sealed class AsciiTreeNodeFormatter(
 		};
 	}
 
-	private string GetRootLeftText(TreeNode root) {
+	private string GetRootLeftText(Trees.TreeNode root) {
 		return _options.ShowIcons
 			? _options.DirectoryIcon + root.Name
 			: root.Name;
 	}
 
-	private string GetIcon(TreeNode node) {
+	private string GetIcon(Trees.TreeNode node) {
 		if (!_options.ShowIcons) {
 			return "";
 		}
@@ -168,13 +171,13 @@ public sealed class AsciiTreeNodeFormatter(
 			: _options.DirectoryIcon;
 	}
 
-	private int GetDisplayLineCount(TreeNode node) {
+	private int GetDisplayLineCount(Trees.TreeNode node) {
 		return node.IsFile
 			? node.LineCount
 			: node.TotalLines;
 	}
 
-	private int GetDisplayLabelCount(TreeNode node) {
+	private int GetDisplayLabelCount(Trees.TreeNode node) {
 		return node.IsFile
 			? node.LabelCount
 			: node.TotalLabelCount;

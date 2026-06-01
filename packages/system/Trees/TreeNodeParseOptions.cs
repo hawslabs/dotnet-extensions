@@ -1,4 +1,4 @@
-namespace HawsLabs.Extensions.LINQPad.Trees;
+namespace System.Trees;
 
 public sealed record TreeNodeParseOptions {
 	public string? BasePath { get; init; }

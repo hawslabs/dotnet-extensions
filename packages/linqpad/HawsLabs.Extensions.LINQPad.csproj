@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net10.0</TargetFramework>
+		<RootNamespace>$(NamespacePrefix).LINQPad</RootNamespace>
+		<AssemblyName>$(NamespacePrefix).LINQPad</AssemblyName>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\system\HawsLabs.Extensions.System.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="HawsLabs.Analyzers">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="LINQPad.Runtime" />
+	</ItemGroup>
+
+</Project>

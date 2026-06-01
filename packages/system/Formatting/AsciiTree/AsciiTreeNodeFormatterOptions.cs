@@ -1,4 +1,4 @@
-namespace HawsLabs.Extensions.LINQPad.Formatting.AsciiTree;
+namespace System.Formatting.AsciiTree;
 
 public sealed record AsciiTreeNodeFormatterOptions {
 	public TreeSortOrder SortOrder { get; init; } = TreeSortOrder.Alphabetical;
@@ -16,4 +16,3 @@ public sealed record AsciiTreeNodeFormatterOptions {
 	public string NumberFormat { get; init; } = "N0";
 	public CultureInfo Culture { get; init; } = CultureInfo.CurrentCulture;
 }
-

@@ -1,6 +1,6 @@
-﻿namespace HawsLabs.Extensions.LINQPad.IO;
+namespace System.IO;
 
-using System.Collections.Generic;
+using Collections.Generic;
 
 using Microsoft.Extensions.FileSystemGlobbing;
 
