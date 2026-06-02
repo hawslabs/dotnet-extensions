@@ -6,6 +6,11 @@ indent_size = 4
 tab_width = 4
 indent_brace_style = 1TBS
 
+[*.{yml,yaml}]
+indent_style = space
+indent_size = 2
+tab_width = 2
+
 [*.cs]
 insert_final_newline = false
 

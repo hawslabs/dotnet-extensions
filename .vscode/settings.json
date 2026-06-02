@@ -1,0 +1,25 @@
+{
+	"files.associations": {
+		"*.props": "xml",
+		"*.targets": "xml",
+		"*.sln": "msbuild",
+		"*.slnx": "xml",
+		"*.csproj": "xml",
+		"*.json": "jsonc",
+	},
+	"[xml]": {
+		"editor.defaultFormatter": "redhat.vscode-xml",
+		"editor.formatOnSave": false,
+		"editor.formatOnType": false,
+		"editor.formatOnPaste": false,
+	},
+	"xml.format.enabled": false,
+	"xml.validation.enabled": false,
+	"xml.fileAssociations": [
+		{
+			"pattern": "**/*.{sln,slnx,props,targets,csproj,esproj}",
+			"systemId": "https://raw.githubusercontent.com/dotnet/msbuild/v17.14.13/src/MSBuild/Microsoft.Build.xsd"
+		}
+	]
+
+}

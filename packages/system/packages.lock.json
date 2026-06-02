@@ -1,0 +1,25 @@
+{
+  "version": 2,
+  "dependencies": {
+    "net10.0": {
+      "BraceExpander": {
+        "type": "Direct",
+        "requested": "[1.0.4, )",
+        "resolved": "1.0.4",
+        "contentHash": "ozLtJnid6yACddYwc3u2Rd1xpxa30kCOU6tWB/3HBoftsvDDk6d0/BvCs7gdXzi/L+nzMI3xOjgw4q6De0D+yw=="
+      },
+      "HawsLabs.Analyzers": {
+        "type": "Direct",
+        "requested": "[26.601.1610, )",
+        "resolved": "26.601.1610",
+        "contentHash": "j4EcUNtLSEzj0EZq/4opKtC/s036JXd/8v0LQa7X4A3ttO59gGkbDutlXQDscMGvSGl7IHtiQJuiyTHLgQNWIw=="
+      },
+      "Microsoft.Extensions.FileSystemGlobbing": {
+        "type": "Direct",
+        "requested": "[10.0.8, )",
+        "resolved": "10.0.8",
+        "contentHash": "IUQet3SY51xIFcFZKtAB6a54/Zdxs7T3SQ84kJtOD6yeXfZgiOMksACWD5qtTmXGQGFH4QYGBOT0KIO8Uy/dJw=="
+      }
+    }
+  }
+}
