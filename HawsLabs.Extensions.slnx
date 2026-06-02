@@ -8,4 +8,5 @@
   </Folder>
   <Project Path="packages/linqpad/HawsLabs.Extensions.LINQPad.csproj" />
   <Project Path="packages/system/HawsLabs.Extensions.System.csproj" />
+  <Project Path="tests/system/HawsLabs.Extensions.System.Tests.csproj" />
 </Solution>

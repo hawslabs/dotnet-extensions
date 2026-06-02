@@ -9,6 +9,8 @@ public sealed class TreeNode {
 
 	public string Name { get; }
 	public string? FullPath { get; private set; }
+	public string? RelativePath { get; private set; }
+	public FileInfo? File { get; private set; }
 	public int LineCount { get; private set; }
 	public int LabelCount { get; private set; }
 	public int TotalLines { get; private set; }
@@ -29,28 +31,24 @@ public sealed class TreeNode {
 		Children = new OrderedTreeNodeDictionary(childNameComparer);
 	}
 
-	public static TreeNode Parse(IEnumerable<FileInfo> files) {
-		return Parse(files, null);
-	}
-
-	public static TreeNode Parse(IEnumerable<FileInfo> files, TreeNodeParseOptions? options) {
+	public static TreeNode Parse(IEnumerable<FileInfo> files, TreeNodeParseOptions? options = null) {
 		options ??= new TreeNodeParseOptions();
 
 		if (options.SortInputPaths) {
 			files = files.OrderBy(file => file.FullName, options.PathSortComparer).ToList();
 		}
 
-		var basePath = Path.GetFullPath(options.BasePath ?? FindCommonBasePath(files, options.PathComparison));
-		var rootName = options.RootName ?? GetDefaultRootName(basePath);
+		var basePath = Path.GetFullPath(options.BasePath ?? files.FindCommonBasePath(options.PathComparison));
+		var rootName = options.RootName ?? Path.GetFileNameOrPath(basePath);
 
 		var root = new TreeNode(rootName, options.ChildNameComparer);
 
 		foreach (var file in files) {
-			var relativePath = Path.GetRelativePath(basePath, file.FullName).Replace('\\', '/');
-
-			if (options.IgnoreFilesOutsideBasePath && IsOutsideBasePath(relativePath)) {
+			if (options.IgnoreFilesOutsideBasePath && Path.IsOutsideBasePath(basePath, file.FullName, options.PathComparison)) {
 				continue;
 			}
+
+			var relativePath = file.GetRelativeNormalizedPath(basePath);
 
 			var parts = relativePath.Split('/', StringSplitOptions.RemoveEmptyEntries);
 			if (parts.Length == 0) {
@@ -63,11 +61,11 @@ public sealed class TreeNode {
 				node = node.GetOrAdd(part);
 			}
 
-			var metrics = options.ReadFileMetrics
-				? ReadMetrics(file.FullName, options)
-				: new FileMetrics(0, 0);
+			var metadata = options.ReadFileMetrics
+				? ReadMetadata(file, relativePath, options)
+				: new FileMetadata(file, file.FullName, relativePath, 0, 0);
 
-			node.SetFileMetrics(file.FullName, metrics.LineCount, metrics.LabelCount);
+			node.SetFileMetadata(metadata);
 		}
 
 		root.ComputeTotals();
@@ -81,18 +79,22 @@ public sealed class TreeNode {
 	}
 
 	public TreeNode GetOrAdd(string name) {
-		if (!Children.TryGetValue(name, out var child)) {
-			child = new TreeNode(name, _childNameComparer);
-			Children[name] = child;
+		if (Children.TryGetValue(name, out var child)) {
+			return child;
 		}
+
+		child = new TreeNode(name, _childNameComparer);
+		Children[name] = child;
 
 		return child;
 	}
 
-	private void SetFileMetrics(string fullPath, int lineCount, int labelCount) {
-		FullPath = fullPath;
-		LineCount = lineCount;
-		LabelCount = labelCount;
+	private void SetFileMetadata(FileMetadata metadata) {
+		File = metadata.File;
+		FullPath = metadata.FullPath;
+		RelativePath = metadata.RelativePath;
+		LineCount = metadata.LineCount;
+		LabelCount = metadata.LabelCount;
 	}
 
 	private void ComputeTotals() {
@@ -104,12 +106,12 @@ public sealed class TreeNode {
 		TotalLabelCount = LabelCount + Children.Values.Sum(child => child.TotalLabelCount);
 	}
 
-	private static FileMetrics ReadMetrics(string fullPath, TreeNodeParseOptions options) {
+	private static FileMetadata ReadMetadata(FileInfo file, string relativePath, TreeNodeParseOptions options) {
 		try {
 			var lineCount = 0;
 			var labelCount = 0;
 
-			foreach (var line in options.ReadLines(fullPath)) {
+			foreach (var line in options.ReadLines(file.FullName)) {
 				lineCount++;
 
 				if (options.LabelPredicate(line)) {
@@ -117,58 +119,17 @@ public sealed class TreeNode {
 				}
 			}
 
-			return new FileMetrics(lineCount, labelCount);
+			return new FileMetadata(file, file.FullName, relativePath, lineCount, labelCount);
 		} catch when (options.IgnoreFileReadErrors) {
-			return new FileMetrics(0, 0);
+			return new FileMetadata(file, file.FullName, relativePath, 0, 0);
 		}
 	}
 
-	private static bool IsOutsideBasePath(string relativePath) {
-		return relativePath == ".."
-			|| relativePath.StartsWith("../", StringComparison.Ordinal)
-			|| Path.IsPathRooted(relativePath);
-	}
-
-	private static string FindCommonBasePath(IEnumerable<FileInfo> files, StringComparison comparison) {
-		if (!files.Any()) {
-			return Directory.GetCurrentDirectory();
-		}
-
-		var common = Path.GetDirectoryName(files.First().FullName) ?? Directory.GetCurrentDirectory();
-
-		foreach (var file in files.Skip(1)) {
-			var directory = Path.GetDirectoryName(file.FullName) ?? Directory.GetCurrentDirectory();
-
-			while (!IsSameOrChildPath(directory, common, comparison)) {
-				var parent = Directory.GetParent(common);
-				if (parent is null) {
-					return common;
-				}
-
-				common = parent.FullName;
-			}
-		}
-
-		return common;
-	}
-
-	private static bool IsSameOrChildPath(string path, string candidateParent, StringComparison comparison) {
-		var normalizedPath = path.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
-		var normalizedParent = candidateParent.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
-
-		return normalizedPath.Equals(normalizedParent, comparison)
-			|| normalizedPath.StartsWith(normalizedParent + Path.DirectorySeparatorChar, comparison)
-			|| normalizedPath.StartsWith(normalizedParent + Path.AltDirectorySeparatorChar, comparison);
-	}
-
-	private static string GetDefaultRootName(string basePath) {
-		var trimmed = basePath.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
-		var name = Path.GetFileName(trimmed);
-
-		return string.IsNullOrWhiteSpace(name)
-			? trimmed
-			: name;
-	}
-
-	private readonly record struct FileMetrics(int LineCount, int LabelCount);
+	private readonly record struct FileMetadata(
+		FileInfo File,
+		string FullPath,
+		string RelativePath,
+		int LineCount,
+		int LabelCount
+	);
 }
