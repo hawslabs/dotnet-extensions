@@ -2,7 +2,7 @@ using System.Trees.Formatting.Ascii;
 
 public static class DumpAsAsciiTreeExtensions {
 	extension(IEnumerable<FileInfo> paths) {
-		public object DumpAsAsciiTree(string basePath, AsciiTreeNodeFormatterOptions? options = null) {
+		public object DumpAsAsciiTree(string basePath, AsciiTreeFormatterOptions? options = null) {
 			var tree = System.Net.WebUtility.HtmlEncode(paths.ToAsciiTree(basePath, options));
 			return Util.RawHtml(
 				$"""

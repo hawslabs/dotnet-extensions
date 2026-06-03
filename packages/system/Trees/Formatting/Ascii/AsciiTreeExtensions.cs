@@ -4,7 +4,7 @@ using Parsing;
 
 public static class AsciiTreeExtensions {
 	extension(IEnumerable<FileInfo> paths) {
-		public string ToAsciiTree(string basePath, AsciiTreeNodeFormatterOptions? options = null) {
+		public string ToAsciiTree(string basePath, AsciiTreeFormatterOptions? options = null) {
 			options ??= new() {
 				SortOrder = TreeSortOrder.Alphabetical,
 				ShowIcons = true,
@@ -18,7 +18,7 @@ public static class AsciiTreeExtensions {
 			});
 
 			return rootNode.Format(
-				new AsciiTreeNodeFormatter(options)
+				new AsciiTreeFormatter(options)
 			);
 		}
 	}

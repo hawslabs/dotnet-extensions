@@ -1,6 +1,6 @@
 namespace System.Trees.Formatting.Ascii;
 
-public sealed record AsciiTreeNodeFormatterOptions {
+public sealed record AsciiTreeFormatterOptions {
 	public TreeSortOrder SortOrder { get; init; } = TreeSortOrder.Alphabetical;
 	public StringComparer NameComparer { get; init; } = StringComparer.OrdinalIgnoreCase;
 	public bool AlignColumns { get; init; } = true;

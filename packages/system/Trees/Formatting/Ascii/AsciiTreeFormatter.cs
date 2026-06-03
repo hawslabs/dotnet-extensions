@@ -2,11 +2,11 @@ namespace System.Trees.Formatting.Ascii;
 
 using Nodes;
 
-public sealed class AsciiTreeNodeFormatter(
-	AsciiTreeNodeFormatterOptions? options = null
+public sealed class AsciiTreeFormatter(
+	AsciiTreeFormatterOptions? options = null
 ) : ITreeNodeFormatter {
-	private readonly AsciiTreeNodeFormatterOptions _options
-		= options ?? new AsciiTreeNodeFormatterOptions();
+	private readonly AsciiTreeFormatterOptions _options
+		= options ?? new AsciiTreeFormatterOptions();
 
 	public string Format(TreeNode root) {
 		ArgumentNullException.ThrowIfNull(root);
