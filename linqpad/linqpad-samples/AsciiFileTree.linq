@@ -20,12 +20,12 @@ void Main() {
 			"**/node_modules/",
 			"**/{artifacts,.artifacts,obj,bin,.vs}/",
 		]
-	).DumpAsAsciiTree(Util.GitRootDirectory!.FullName, new() {
+	).ToAsciiTree(new() {
 		SortOrder = TreeSortOrder.AlphabeticalDirectoriesFirst,
 		ShowIcons = true,
 		//ShowLabels = true,
 		ShowLineCounts = true,
 		AlignColumns = true,
 		LineCountIcon = "#️⃣"
-	});
+	}).Dump();
 }

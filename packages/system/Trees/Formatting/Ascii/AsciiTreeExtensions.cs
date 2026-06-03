@@ -1,8 +1,12 @@
 namespace System.Trees.Formatting.Ascii;
 
+using Parsing;
+
 public static class AsciiTreeExtensions {
 	extension(IEnumerable<FileInfo> paths) {
-		public string ToAsciiTree(AsciiTreeFormatterOptions? options = null) {
+		public AsciiTree ToAsciiTree(AsciiTreeFormatterOptions? options = null) {
+			ArgumentNullException.ThrowIfNull(paths);
+
 			options ??= new() {
 				SortOrder = TreeSortOrder.Alphabetical,
 				ShowIcons = true,
@@ -10,11 +14,15 @@ public static class AsciiTreeExtensions {
 				AlignColumns = true,
 			};
 
-			var basePath = paths.FindCommonBasePath(StringComparison.OrdinalIgnoreCase);
-			var tree = paths.ToFileTree(basePath);
+			var fileTree = FileTreeParser.ParseTree(paths, new() {
+				BasePath = paths.FindCommonBasePath(StringComparison.OrdinalIgnoreCase),
+				PathComparison = StringComparison.OrdinalIgnoreCase,
+				LabelPredicate = static line => line.TrimStart().StartsWith("label_", StringComparison.Ordinal),
+			});
 
-			return tree.Format(
-				new AsciiTreeFormatter(options)
+			return new(
+				fileTree.RootPath,
+				fileTree.Root.Format(new AsciiTreeFormatter(options))
 			);
 		}
 	}

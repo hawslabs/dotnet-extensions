@@ -25,7 +25,8 @@ public sealed class AsciiTreeExtensionsTests {
 			Culture = CultureInfo.InvariantCulture,
 		});
 
-		tree.Should().Be(
+		tree.RootPath.Should().Be(Path.Combine(temp.Root.FullName, "src"));
+		tree.Text.Should().Be(
 			$"""
 			src  3
 			├── App.cs  2
@@ -52,7 +53,8 @@ public sealed class AsciiTreeExtensionsTests {
 		});
 		var maxNameColumnWidth = Math.Max(rootName.Length, "└── Readme.md".Length);
 
-		tree.Should().Be(
+		tree.RootPath.Should().Be(Path.Combine(temp.Root.FullName, "src"));
+		tree.Text.Should().Be(
 			string.Join(
 				Environment.NewLine,
 				$"{rootName.PadRight(maxNameColumnWidth)}  L101",
@@ -60,6 +62,32 @@ public sealed class AsciiTreeExtensionsTests {
 				$"{"└── Readme.md".PadRight(maxNameColumnWidth)}  L  1",
 				""
 			)
+		);
+	}
+
+	[Fact]
+	public void ToAsciiTree_RootPathIsProvided_UsesProvidedRootPath() {
+		using var temp = new TestDirectory();
+		temp.CreateFile("src/App.cs", "Console.WriteLine();");
+		temp.CreateFile("tests/AppTests.cs", "Assert.True(true);");
+
+		var tree = temp.Root.GetFiles("*", SearchOption.AllDirectories).ToAsciiTree(new() {
+			ShowIcons = false,
+			ShowLabels = false,
+			ShowLineCounts = false,
+			AlignColumns = false,
+		});
+
+		tree.RootPath.Should().Be(temp.Root.FullName);
+		tree.Text.Should().Be(
+			$"""
+			{Path.GetFileNameOrPath(temp.Root.FullName)}
+			├── src
+			│   └── App.cs
+			└── tests
+			    └── AppTests.cs
+
+			"""
 		);
 	}
 }

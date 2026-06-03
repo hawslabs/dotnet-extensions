@@ -24,11 +24,11 @@ void Main() {
 			"**/node_modules/",
 			"**/{artifacts,.artifacts,obj,bin,.vs}/",
 		]
-	).DumpAsAsciiTree(Util.GitRootDirectory!.FullName, new() {
+	).ToAsciiTree(Util.GitRootDirectory!.FullName, new() {
 		SortOrder = TreeSortOrder.Alphabetical,
 		ShowIcons = true,
 		ShowLabels = false,
 		ShowLineCounts = false,
 		AlignColumns = true,
-	});
+	}).DumpAsAsciiTree();
 }

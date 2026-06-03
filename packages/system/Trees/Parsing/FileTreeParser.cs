@@ -4,6 +4,10 @@ using Nodes;
 
 public static class FileTreeParser {
 	public static FolderTreeNode Parse(IEnumerable<FileInfo> files, FileTreeParseOptions? options = null) {
+		return ParseTree(files, options).Root;
+	}
+
+	public static FileTree ParseTree(IEnumerable<FileInfo> files, FileTreeParseOptions? options = null) {
 		ArgumentNullException.ThrowIfNull(files);
 
 		options ??= new();
@@ -44,7 +48,7 @@ public static class FileTreeParser {
 
 		root.ComputeTotals();
 
-		return root;
+		return new(basePath, root);
 	}
 
 	private static FileMetadata ReadMetadata(FileInfo file, string relativePath, FileTreeParseOptions options) {
