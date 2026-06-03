@@ -1,5 +1,8 @@
 namespace System.Trees.Formatting.Ascii;
 
+using JetBrains.Annotations;
+using Xml.Linq;
+
 /// <summary>
 /// Represents formatted ASCII tree output and the root path used to build it.
 /// </summary>
@@ -13,4 +16,16 @@ public sealed record AsciiTree(
 	public override string ToString() {
 		return Text;
 	}
+
+    [UsedImplicitly(Reason = "Used by LINQPad rendering adapter.")]
+    private XElement ToDump() {
+	    return new(
+		    name: "LINQPad.HTML",
+		    content: new XElement(
+			    "pre",
+			    new XAttribute("style", "font-family:Consolas,monospace;font-size:13px"),
+			    Text
+		    )
+	    );
+    }
 }

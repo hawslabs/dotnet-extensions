@@ -30,5 +30,5 @@ void Main() {
 		ShowLabels = false,
 		ShowLineCounts = false,
 		AlignColumns = true,
-	}).DumpAsAsciiTree();
+	}).ToDump().Dump();
 }

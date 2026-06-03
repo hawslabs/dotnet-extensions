@@ -3,17 +3,13 @@ namespace HawsLabs.Extensions.Tests;
 using System.IO;
 
 public sealed class TestDirectory : IDisposable {
-	public DirectoryInfo Root { get; }
-
-	public TestDirectory() {
-		Root = Directory.CreateDirectory(
-			Path.Combine(
-				Path.GetTempPath(),
-				"HawsLabs.Extensions.System.Tests",
-				Guid.NewGuid().ToString("N")
-			)
-		);
-	}
+	public DirectoryInfo Root { get; } = Directory.CreateDirectory(
+		Path.Combine(
+			Path.GetTempPath(),
+			"HawsLabs.Extensions.Tests",
+			Guid.NewGuid().ToString("N")
+		)
+	);
 
 	public DirectoryInfo CreateDirectory(string relativePath) {
 		return Directory.CreateDirectory(GetFullPath(relativePath));
@@ -33,6 +29,7 @@ public sealed class TestDirectory : IDisposable {
 
 	public void Dispose() {
 		Root.Refresh();
+
 		if (Root.Exists) {
 			Root.Delete(recursive: true);
 		}
