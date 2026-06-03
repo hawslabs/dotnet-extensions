@@ -4,11 +4,32 @@ using Collections.Generic;
 
 using Microsoft.Extensions.FileSystemGlobbing;
 
-public sealed record GlobsOptions {
-	public StringComparison PatternComparison { get; init; } = StringComparison.OrdinalIgnoreCase;
-	public bool PreserveFilterOrder { get; init; } = false;
-	public bool SortResults { get; init; } = true;
-	public StringComparer SortComparer { get; init; } = StringComparer.OrdinalIgnoreCase;
+public sealed record GlobsOptions(
+	StringComparison PatternComparison,
+	FilterOptions FilterOptions,
+	SortOptions SortOptions
+) {
+	public static readonly GlobsOptions Default = new(
+		PatternComparison: StringComparison.OrdinalIgnoreCase,
+		FilterOptions: FilterOptions.Default,
+		SortOptions: SortOptions.Default
+	);
+}
+
+public sealed record SortOptions(
+	bool Enabled,
+	StringComparison Comparison
+) {
+	public static readonly SortOptions Default = new(
+		Enabled: true,
+		Comparison: StringComparison.OrdinalIgnoreCase
+	);
+}
+
+public sealed record FilterOptions(
+	bool PreserveFilterOrder = false
+) {
+	public static readonly FilterOptions Default = new();
 }
 
 public static class GlobExtensions {
@@ -18,11 +39,11 @@ public static class GlobExtensions {
 			string[] excludePatterns,
 			GlobsOptions? options = null
 		) {
-			options ??= new();
+			options ??= GlobsOptions.Default;
 
 			var matcher = new Matcher(
 				comparisonType: options.PatternComparison,
-				preserveFilterOrder: options.PreserveFilterOrder
+				preserveFilterOrder: options.FilterOptions.PreserveFilterOrder
 			);
 
 			matcher.AddIncludePatterns(includePatterns.SelectMany(BraceExpander.Expander.Expand));
@@ -30,11 +51,13 @@ public static class GlobExtensions {
 
 			var filePaths = matcher.GetResultsInFullPath(directory.FullName);
 
-			if (options.SortResults) {
-				filePaths = filePaths.Order(options.SortComparer);
+			if (!options.SortOptions.Enabled) {
+				return filePaths.Select(path => new FileInfo(path));
 			}
 
-			return filePaths.Select(path => new FileInfo(path));
+			return filePaths
+				.Order(StringComparer.FromComparison(options.SortOptions.Comparison))
+				.Select(path => new FileInfo(path));
 		}
 	}
 }
