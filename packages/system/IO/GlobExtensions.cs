@@ -33,12 +33,21 @@ public sealed record FilterOptions(
 }
 
 public static class GlobExtensions {
+    public static readonly string[] DefaultIncludePatterns = ["**/*"];
+    public static readonly string[] DefaultExcludePatterns = [
+	    ".git",
+	    "**/node_modules/",
+	    "**/{artifacts,.artifacts,obj,bin,.vs}/",
+    ];
+
 	extension(DirectoryInfo directory) {
 		public IEnumerable<FileInfo> Glob(
-			string[] includePatterns,
-			string[] excludePatterns,
+			IEnumerable<string>? includePatterns = null,
+			IEnumerable<string>? excludePatterns = null,
 			GlobsOptions? options = null
 		) {
+			includePatterns ??= DefaultIncludePatterns;
+			excludePatterns ??= DefaultExcludePatterns;
 			options ??= GlobsOptions.Default;
 
 			var matcher = new Matcher(
