@@ -13,8 +13,8 @@ public static class PathExtensions {
 		/// <param name="comparison">One of the enumeration values that specifies how paths are compared.</param>
 		/// <returns><see langword="true" /> if <paramref name="path" /> is outside <paramref name="basePath" />; otherwise, <see langword="false" />.</returns>
 		public static bool IsOutsideBasePath(string basePath, string path, StringComparison comparison) {
-			var normalizedBasePath = Path.GetFullPath(basePath);
-			var normalizedPath = Path.GetFullPath(path, normalizedBasePath);
+			var normalizedBasePath = Path.GetFullPath(NormalizeDirectorySeparators(basePath));
+			var normalizedPath = Path.GetFullPath(NormalizeDirectorySeparators(path), normalizedBasePath);
 
 			return !Path.IsSameOrChildPath(normalizedPath, normalizedBasePath, comparison);
 		}
@@ -48,5 +48,9 @@ public static class PathExtensions {
 				? trimmed
 				: name;
 		}
+
+		private static string NormalizeDirectorySeparators(string path) => path
+			.Replace('\\', Path.DirectorySeparatorChar)
+			.Replace('/', Path.DirectorySeparatorChar);
 	}
 }
