@@ -4,9 +4,9 @@
     "net10.0": {
       "HawsLabs.Analyzers": {
         "type": "Direct",
-        "requested": "[26.601.1610, )",
-        "resolved": "26.601.1610",
-        "contentHash": "j4EcUNtLSEzj0EZq/4opKtC/s036JXd/8v0LQa7X4A3ttO59gGkbDutlXQDscMGvSGl7IHtiQJuiyTHLgQNWIw=="
+        "requested": "[26.603.21316, )",
+        "resolved": "26.603.21316",
+        "contentHash": "Do4SgLLDayUKmLZ+NLY6lKwNM25AbzOlh9whyrp6Ki93AZDDVcEYdtnVOFUVl+HIAy8uY1+f9uE+oJKNbqIF+Q=="
       },
       "LINQPad.Runtime": {
         "type": "Direct",

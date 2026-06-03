@@ -26,5 +26,6 @@ void Main() {
 		//ShowLabels = true,
 		ShowLineCounts = true,
 		AlignColumns = true,
+		LineCountIcon = "#️⃣"
 	});
 }

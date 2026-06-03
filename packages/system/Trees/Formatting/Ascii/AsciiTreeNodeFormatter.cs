@@ -108,12 +108,12 @@ public sealed class AsciiTreeNodeFormatter(
 		var showLabel = _options.ShowLabels && (forceShowLabel || labelCount > 0 || _options.ShowZeroLabelCounts);
 
 		if (_options.ShowLineCounts) {
-			var lineText = FormatNumber(lineCount);
+			var lineText = FormatLineCount(lineCount, _options.AlignColumns ? maxLineColumnWidth : 0);
 
 			if (_options.AlignColumns) {
 				sb.Append(leftText.PadRight(maxNameColumnWidth));
 				sb.Append(_options.ColumnSeparator);
-				sb.Append(lineText.PadLeft(maxLineColumnWidth));
+				sb.Append(lineText);
 			} else {
 				sb.Append(leftText);
 				sb.Append(_options.ColumnSeparator);
@@ -191,5 +191,13 @@ public sealed class AsciiTreeNodeFormatter(
 
 	private string FormatNumber(int value) {
 		return value.ToString(_options.NumberFormat, _options.Culture);
+	}
+
+	private string FormatLineCount(int value, int minNumberWidth) {
+		var number = FormatNumber(value).PadLeft(minNumberWidth);
+
+		return string.IsNullOrEmpty(_options.LineCountIcon)
+			? number
+			: _options.LineCountIcon + number;
 	}
 }

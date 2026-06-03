@@ -10,6 +10,7 @@ public sealed record AsciiTreeNodeFormatterOptions {
 	public bool ShowZeroLabelCounts { get; init; } = false;
 	public string DirectoryIcon { get; init; } = "📁";
 	public string FileIcon { get; init; } = "📄";
+	public string? LineCountIcon { get; init; }
 	public string LabelIcon { get; init; } = "🏷️";
 	public string ColumnSeparator { get; init; } = "  ";
 	public string LabelSeparator { get; init; } = "  ";
