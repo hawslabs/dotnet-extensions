@@ -1,9 +1,10 @@
 <Query Kind="Program">
-  <Reference Relative="..\..\.artifacts\bin\HawsLabs.Extensions.LINQPad\debug\HawsLabs.Extensions.LINQPad.dll">D:\hawslabs\extensions\.artifacts\bin\HawsLabs.Extensions.LINQPad\debug\HawsLabs.Extensions.LINQPad.dll</Reference>
-  <Reference Relative="..\..\.artifacts\bin\HawsLabs.Extensions.LINQPad\debug\HawsLabs.Extensions.System.dll">D:\hawslabs\extensions\.artifacts\bin\HawsLabs.Extensions.LINQPad\debug\HawsLabs.Extensions.System.dll</Reference>
-  <Namespace>System.Formatting</Namespace>
-  <Namespace>System.Formatting.AsciiTree</Namespace>
-  <Namespace>System.Trees</Namespace>
+  <Reference Relative="..\..\.artifacts\bin\HawsLabs.Extensions.LINQPad\debug\HawsLabs.Extensions.LINQPad.dll">D:\hawslabs\dotnet-extensions\.artifacts\bin\HawsLabs.Extensions.LINQPad\debug\HawsLabs.Extensions.LINQPad.dll</Reference>
+  <Reference Relative="..\..\.artifacts\bin\HawsLabs.Extensions.LINQPad\debug\HawsLabs.Extensions.System.dll">D:\hawslabs\dotnet-extensions\.artifacts\bin\HawsLabs.Extensions.LINQPad\debug\HawsLabs.Extensions.System.dll</Reference>
+  <Namespace>System.Trees.Formatting</Namespace>
+  <Namespace>System.Trees.Formatting.Ascii</Namespace>
+  <Namespace>System.Trees.Nodes</Namespace>
+  <Namespace>System.Trees.Parsing</Namespace>
 </Query>
 
 void Main() {
@@ -22,8 +23,8 @@ void Main() {
 	).DumpAsAsciiTree(Util.GitRootDirectory!.FullName, new() {
 		SortOrder = TreeSortOrder.AlphabeticalDirectoriesFirst,
 		ShowIcons = true,
-		ShowLabels = false,
-		ShowLineCounts = false,
+		//ShowLabels = true,
+		ShowLineCounts = true,
 		AlignColumns = true,
 	});
 }

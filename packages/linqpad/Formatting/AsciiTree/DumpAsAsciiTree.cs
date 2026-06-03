@@ -1,4 +1,4 @@
-using System.Formatting.AsciiTree;
+using System.Trees.Formatting.Ascii;
 
 public static class DumpAsAsciiTreeExtensions {
 	extension(IEnumerable<FileInfo> paths) {

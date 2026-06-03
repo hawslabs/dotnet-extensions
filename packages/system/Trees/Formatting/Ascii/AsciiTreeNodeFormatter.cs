@@ -1,4 +1,6 @@
-namespace System.Formatting.AsciiTree;
+namespace System.Trees.Formatting.Ascii;
+
+using Nodes;
 
 public sealed class AsciiTreeNodeFormatter(
 	AsciiTreeNodeFormatterOptions? options = null
@@ -6,12 +8,12 @@ public sealed class AsciiTreeNodeFormatter(
 	private readonly AsciiTreeNodeFormatterOptions _options
 		= options ?? new AsciiTreeNodeFormatterOptions();
 
-	public string Format(Trees.TreeNode root) {
+	public string Format(TreeNode root) {
 		ArgumentNullException.ThrowIfNull(root);
 
 		var maxNameColumnWidth = GetRootLeftText(root).Length;
 		var maxLineColumnWidth = _options.ShowLineCounts
-			? FormatNumber(root.TotalLines).Length
+			? FormatNumber(GetDisplayLineCount(root)).Length
 			: 0;
 
 		Measure(root, indent: "", ref maxNameColumnWidth, ref maxLineColumnWidth);
@@ -21,8 +23,8 @@ public sealed class AsciiTreeNodeFormatter(
 		AppendNodeLine(
 			sb,
 			leftText: GetRootLeftText(root),
-			lineCount: root.TotalLines,
-			labelCount: root.TotalLabelCount,
+			lineCount: GetDisplayLineCount(root),
+			labelCount: GetDisplayLabelCount(root),
 			maxNameColumnWidth,
 			maxLineColumnWidth,
 			forceShowLabel: true
@@ -40,7 +42,7 @@ public sealed class AsciiTreeNodeFormatter(
 	}
 
 	private void Measure(
-		Trees.TreeNode node,
+		TreeNode node,
 		string indent,
 		ref int maxNameColumnWidth,
 		ref int maxLineColumnWidth
@@ -65,7 +67,7 @@ public sealed class AsciiTreeNodeFormatter(
 
 	private void RenderChildren(
 		StringBuilder sb,
-		Trees.TreeNode node,
+		TreeNode node,
 		string indent,
 		int maxNameColumnWidth,
 		int maxLineColumnWidth
@@ -132,10 +134,10 @@ public sealed class AsciiTreeNodeFormatter(
 		sb.AppendLine();
 	}
 
-	private IReadOnlyList<Trees.TreeNode> GetSortedChildren(Trees.TreeNode node) {
+	private IReadOnlyList<TreeNode> GetSortedChildren(TreeNode node) {
 		return _options.SortOrder switch {
 			TreeSortOrder.AlphabeticalDirectoriesFirst => node.Children.Values
-				.OrderBy(child => child.IsFile)
+				.OrderBy(child => child is FileTreeNode)
 				.ThenBy(child => child.Name, _options.NameComparer)
 				.ToList(),
 
@@ -155,32 +157,36 @@ public sealed class AsciiTreeNodeFormatter(
 		};
 	}
 
-	private string GetRootLeftText(Trees.TreeNode root) {
+	private string GetRootLeftText(TreeNode root) {
 		return _options.ShowIcons
 			? _options.DirectoryIcon + root.Name
 			: root.Name;
 	}
 
-	private string GetIcon(Trees.TreeNode node) {
+	private string GetIcon(TreeNode node) {
 		if (!_options.ShowIcons) {
 			return "";
 		}
 
-		return node.IsFile
+		return node is FileTreeNode
 			? _options.FileIcon
 			: _options.DirectoryIcon;
 	}
 
-	private int GetDisplayLineCount(Trees.TreeNode node) {
-		return node.IsFile
-			? node.LineCount
-			: node.TotalLines;
+	private int GetDisplayLineCount(TreeNode node) {
+		return node switch {
+			FileTreeNode file => file.LineCount,
+			FolderTreeNode folder => folder.TotalLines,
+			_ => 0,
+		};
 	}
 
-	private int GetDisplayLabelCount(Trees.TreeNode node) {
-		return node.IsFile
-			? node.LabelCount
-			: node.TotalLabelCount;
+	private int GetDisplayLabelCount(TreeNode node) {
+		return node switch {
+			FileTreeNode file => file.LabelCount,
+			FolderTreeNode folder => folder.TotalLabelCount,
+			_ => 0,
+		};
 	}
 
 	private string FormatNumber(int value) {

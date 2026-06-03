@@ -1,4 +1,4 @@
-namespace System.Formatting.AsciiTree;
+namespace System.Trees.Formatting.Ascii;
 
 public sealed record AsciiTreeNodeFormatterOptions {
 	public TreeSortOrder SortOrder { get; init; } = TreeSortOrder.Alphabetical;

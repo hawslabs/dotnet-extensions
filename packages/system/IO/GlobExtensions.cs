@@ -18,7 +18,7 @@ public static class GlobExtensions {
 			string[] excludePatterns,
 			GlobsOptions? options = null
 		) {
-			options ??= new GlobsOptions();
+			options ??= new();
 
 			var matcher = new Matcher(
 				comparisonType: options.PatternComparison,

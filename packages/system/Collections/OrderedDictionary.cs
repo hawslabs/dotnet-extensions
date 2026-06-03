@@ -10,12 +10,12 @@ public sealed class OrderedDictionary<TKey, TValue>(
 		get => _list[_index[key]].Value;
 		set {
 			if (_index.TryGetValue(key, out var existingIndex)) {
-				_list[existingIndex] = new KeyValuePair<TKey, TValue>(key, value);
+				_list[existingIndex] = new(key, value);
 				return;
 			}
 
 			_index[key] = _list.Count;
-			_list.Add(new KeyValuePair<TKey, TValue>(key, value));
+			_list.Add(new(key, value));
 		}
 	}
 

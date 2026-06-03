@@ -28,7 +28,7 @@ public sealed class TestDirectory : IDisposable {
 
 		File.WriteAllText(fullPath, contents);
 
-		return new FileInfo(fullPath);
+		return new(fullPath);
 	}
 
 	public void Dispose() {

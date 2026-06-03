@@ -4,10 +4,11 @@
   <Namespace>HawsLabs.Extensions.LINQPad</Namespace>
   <Namespace>HawsLabs.Extensions.LINQPad.Formatting.AsciiTree</Namespace>
 	<Namespace>System.Collections</Namespace>
-	<Namespace>System.Formatting</Namespace>
-	<Namespace>System.Formatting.AsciiTree</Namespace>
 	<Namespace>System.IO</Namespace>
-	<Namespace>System.Trees</Namespace>
+	<Namespace>System.Trees.Formatting</Namespace>
+	<Namespace>System.Trees.Formatting.Ascii</Namespace>
+	<Namespace>System.Trees.Nodes</Namespace>
+	<Namespace>System.Trees.Parsing</Namespace>
 </Query>
 
 void Main() {

@@ -1,4 +1,4 @@
-namespace System.Formatting;
+namespace System.Trees.Formatting;
 
 public enum TreeSortOrder {
 	Alphabetical,

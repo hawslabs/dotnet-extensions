@@ -1,22 +1,21 @@
-namespace System.Formatting.AsciiTree;
+namespace System.Trees.Formatting.Ascii;
+
+using Parsing;
 
 public static class AsciiTreeExtensions {
 	extension(IEnumerable<FileInfo> paths) {
 		public string ToAsciiTree(string basePath, AsciiTreeNodeFormatterOptions? options = null) {
-			options ??= new AsciiTreeNodeFormatterOptions {
+			options ??= new() {
 				SortOrder = TreeSortOrder.Alphabetical,
 				ShowIcons = true,
 				ShowLabels = true,
 				AlignColumns = true,
 			};
 
-			var rootNode = Trees.TreeNode.Parse(
-				paths,
-				new Trees.TreeNodeParseOptions {
-					BasePath = basePath,
-					LabelPredicate = static line => line.TrimStart().StartsWith("label_", StringComparison.Ordinal),
-				}
-			);
+			var rootNode = FileTreeParser.Parse(paths, new() {
+				BasePath = basePath,
+				LabelPredicate = static line => line.TrimStart().StartsWith("label_", StringComparison.Ordinal),
+			});
 
 			return rootNode.Format(
 				new AsciiTreeNodeFormatter(options)

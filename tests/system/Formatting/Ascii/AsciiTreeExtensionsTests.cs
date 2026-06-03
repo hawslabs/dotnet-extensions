@@ -1,7 +1,7 @@
-namespace HawsLabs.Extensions.Tests.Formatting.AsciiTree;
+namespace HawsLabs.Extensions.Tests.Formatting.Ascii;
 
-using System.Formatting.AsciiTree;
 using System.Globalization;
+using System.Trees.Formatting.Ascii;
 
 using FluentAssertions;
 
@@ -18,7 +18,7 @@ public sealed class AsciiTreeExtensionsTests {
 		var files = new[] { readme, app };
 		var rootName = Path.GetFileNameOrPath(temp.Root.FullName);
 
-		var tree = files.ToAsciiTree(temp.Root.FullName, new AsciiTreeNodeFormatterOptions {
+		var tree = files.ToAsciiTree(temp.Root.FullName, new() {
 			ShowIcons = false,
 			ShowLabels = false,
 			ShowLineCounts = true,
