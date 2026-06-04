@@ -11,6 +11,25 @@ using Xunit;
 
 public sealed class AsciiTreeExtensionsTests {
 	[Fact]
+	public void AsciiTree_TextIsRead_EvaluatesLazyText() {
+		var evaluations = 0;
+		var text = new Lazy<string>(() => {
+			evaluations++;
+
+			return "root";
+		});
+
+		var tree = new AsciiTree(RootPath: "root", Text: text);
+
+		tree.RootPath.Should().Be("root");
+		tree.Text.IsValueCreated.Should().BeFalse();
+
+		tree.Text.Value.Should().Be("root");
+		evaluations.Should().Be(1);
+		tree.Text.IsValueCreated.Should().BeTrue();
+	}
+
+	[Fact]
 	public void ToAsciiTree_FilesShareCommonDirectory_ReturnsFormattedAsciiTree() {
 		using var temp = new TestDirectory();
 		var app = temp.CreateFile("src/App.cs", "label_app\nConsole.WriteLine();");
@@ -21,12 +40,13 @@ public sealed class AsciiTreeExtensionsTests {
 			ShowIcons = false,
 			ShowLabels = false,
 			ShowLineCounts = true,
+			LineCountIcon = null,
 			AlignColumns = false,
 			Culture = CultureInfo.InvariantCulture,
 		});
 
 		tree.RootPath.Should().Be(Path.Combine(temp.Root.FullName, "src"));
-		tree.Text.Should().Be(
+		tree.Text.Value.Should().Be(
 			$"""
 			src  3
 			├── App.cs  2
@@ -54,7 +74,7 @@ public sealed class AsciiTreeExtensionsTests {
 		var maxNameColumnWidth = Math.Max(rootName.Length, "└── Readme.md".Length);
 
 		tree.RootPath.Should().Be(Path.Combine(temp.Root.FullName, "src"));
-		tree.Text.Should().Be(
+		tree.Text.Value.Should().Be(
 			string.Join(
 				Environment.NewLine,
 				$"{rootName.PadRight(maxNameColumnWidth)}  L101",
@@ -79,7 +99,7 @@ public sealed class AsciiTreeExtensionsTests {
 		});
 
 		tree.RootPath.Should().Be(temp.Root.FullName);
-		tree.Text.Should().Be(
+		tree.Text.Value.Should().Be(
 			$"""
 			{Path.GetFileNameOrPath(temp.Root.FullName)}
 			├── src

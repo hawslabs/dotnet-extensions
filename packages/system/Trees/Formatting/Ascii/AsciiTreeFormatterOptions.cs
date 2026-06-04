@@ -1,7 +1,9 @@
 namespace System.Trees.Formatting.Ascii;
 
 public sealed record AsciiTreeFormatterOptions {
-	public TreeSortOrder SortOrder { get; init; } = TreeSortOrder.Alphabetical;
+    public static readonly AsciiTreeFormatterOptions Default = new();
+
+	public TreeSortOrder SortOrder { get; init; } = TreeSortOrder.AlphabeticalDirectoriesFirst;
 	public StringComparer NameComparer { get; init; } = StringComparer.OrdinalIgnoreCase;
 	public bool AlignColumns { get; init; } = true;
 	public bool ShowIcons { get; init; } = true;
@@ -10,7 +12,7 @@ public sealed record AsciiTreeFormatterOptions {
 	public bool ShowZeroLabelCounts { get; init; } = false;
 	public string DirectoryIcon { get; init; } = "📁";
 	public string FileIcon { get; init; } = "📄";
-	public string? LineCountIcon { get; init; }
+	public string? LineCountIcon { get; init; } = "#️⃣";
 	public string LabelIcon { get; init; } = "🏷️";
 	public string ColumnSeparator { get; init; } = "  ";
 	public string LabelSeparator { get; init; } = "  ";

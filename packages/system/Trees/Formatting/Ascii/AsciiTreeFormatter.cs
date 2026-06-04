@@ -3,16 +3,17 @@ namespace System.Trees.Formatting.Ascii;
 using Nodes;
 
 public sealed class AsciiTreeFormatter(
-	AsciiTreeFormatterOptions? options = null
+	AsciiTreeFormatterOptions options
 ) : ITreeNodeFormatter {
-	private readonly AsciiTreeFormatterOptions _options
-		= options ?? new AsciiTreeFormatterOptions();
+    public static readonly AsciiTreeFormatter Default = new(
+	    options: AsciiTreeFormatterOptions.Default
+	);
 
 	public string Format(TreeNode root) {
 		ArgumentNullException.ThrowIfNull(root);
 
 		var maxNameColumnWidth = GetRootLeftText(root).Length;
-		var maxLineColumnWidth = _options.ShowLineCounts
+		var maxLineColumnWidth = options.ShowLineCounts
 			? FormatNumber(GetDisplayLineCount(root)).Length
 			: 0;
 
@@ -56,7 +57,7 @@ public sealed class AsciiTreeFormatter(
 
 			maxNameColumnWidth = Math.Max(maxNameColumnWidth, leftText.Length);
 
-			if (_options.ShowLineCounts) {
+			if (options.ShowLineCounts) {
 				var lineText = FormatNumber(GetDisplayLineCount(child));
 				maxLineColumnWidth = Math.Max(maxLineColumnWidth, lineText.Length);
 			}
@@ -105,72 +106,72 @@ public sealed class AsciiTreeFormatter(
 		int maxLineColumnWidth,
 		bool forceShowLabel
 	) {
-		var showLabel = _options.ShowLabels && (forceShowLabel || labelCount > 0 || _options.ShowZeroLabelCounts);
+		var showLabel = options.ShowLabels && (forceShowLabel || labelCount > 0 || options.ShowZeroLabelCounts);
 
-		if (_options.ShowLineCounts) {
-			var lineText = FormatLineCount(lineCount, _options.AlignColumns ? maxLineColumnWidth : 0);
+		if (options.ShowLineCounts) {
+			var lineText = FormatLineCount(lineCount, options.AlignColumns ? maxLineColumnWidth : 0);
 
-			if (_options.AlignColumns) {
+			if (options.AlignColumns) {
 				sb.Append(leftText.PadRight(maxNameColumnWidth));
-				sb.Append(_options.ColumnSeparator);
+				sb.Append(options.ColumnSeparator);
 				sb.Append(lineText);
 			} else {
 				sb.Append(leftText);
-				sb.Append(_options.ColumnSeparator);
+				sb.Append(options.ColumnSeparator);
 				sb.Append(lineText);
 			}
-		} else if (_options.AlignColumns && showLabel) {
+		} else if (options.AlignColumns && showLabel) {
 			sb.Append(leftText.PadRight(maxNameColumnWidth));
 		} else {
 			sb.Append(leftText);
 		}
 
 		if (showLabel) {
-			sb.Append(_options.LabelSeparator);
-			sb.Append(_options.LabelIcon);
-			sb.Append(labelCount.ToString(_options.NumberFormat, _options.Culture));
+			sb.Append(options.LabelSeparator);
+			sb.Append(options.LabelIcon);
+			sb.Append(labelCount.ToString(options.NumberFormat, options.Culture));
 		}
 
 		sb.AppendLine();
 	}
 
 	private IReadOnlyList<TreeNode> GetSortedChildren(TreeNode node) {
-		return _options.SortOrder switch {
+		return options.SortOrder switch {
 			TreeSortOrder.AlphabeticalDirectoriesFirst => node.Children.Values
 				.OrderBy(child => child is FileTreeNode)
-				.ThenBy(child => child.Name, _options.NameComparer)
+				.ThenBy(child => child.Name, options.NameComparer)
 				.ToList(),
 
 			TreeSortOrder.LinesOfCodeDesc => node.Children.Values
 				.OrderByDescending(GetDisplayLineCount)
-				.ThenBy(child => child.Name, _options.NameComparer)
+				.ThenBy(child => child.Name, options.NameComparer)
 				.ToList(),
 
 			TreeSortOrder.LabelCountDesc => node.Children.Values
 				.OrderByDescending(GetDisplayLabelCount)
-				.ThenBy(child => child.Name, _options.NameComparer)
+				.ThenBy(child => child.Name, options.NameComparer)
 				.ToList(),
 
 			_ => node.Children.Values
-				.OrderBy(child => child.Name, _options.NameComparer)
+				.OrderBy(child => child.Name, options.NameComparer)
 				.ToList(),
 		};
 	}
 
 	private string GetRootLeftText(TreeNode root) {
-		return _options.ShowIcons
-			? _options.DirectoryIcon + root.Name
+		return options.ShowIcons
+			? options.DirectoryIcon + root.Name
 			: root.Name;
 	}
 
 	private string GetIcon(TreeNode node) {
-		if (!_options.ShowIcons) {
+		if (!options.ShowIcons) {
 			return "";
 		}
 
 		return node is FileTreeNode
-			? _options.FileIcon
-			: _options.DirectoryIcon;
+			? options.FileIcon
+			: options.DirectoryIcon;
 	}
 
 	private int GetDisplayLineCount(TreeNode node) {
@@ -190,14 +191,14 @@ public sealed class AsciiTreeFormatter(
 	}
 
 	private string FormatNumber(int value) {
-		return value.ToString(_options.NumberFormat, _options.Culture);
+		return value.ToString(options.NumberFormat, options.Culture);
 	}
 
 	private string FormatLineCount(int value, int minNumberWidth) {
 		var number = FormatNumber(value).PadLeft(minNumberWidth);
 
-		return string.IsNullOrEmpty(_options.LineCountIcon)
+		return string.IsNullOrEmpty(options.LineCountIcon)
 			? number
-			: _options.LineCountIcon + number;
+			: options.LineCountIcon + number;
 	}
 }

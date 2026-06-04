@@ -7,14 +7,11 @@ using Xml.Linq;
 /// Represents formatted ASCII tree output and the root path used to build it.
 /// </summary>
 /// <param name="RootPath">The full root path used when parsing the tree.</param>
-/// <param name="Text">The formatted ASCII tree text.</param>
-public sealed record AsciiTree(
-	string RootPath,
-	string Text
-) {
+/// <param name="Text">The lazily formatted ASCII tree text.</param>
+public sealed record AsciiTree(string RootPath, Lazy<string> Text) {
 	/// <inheritdoc />
 	public override string ToString() {
-		return Text;
+		return Text.Value;
 	}
 
     [UsedImplicitly(Reason = "Used by LINQPad rendering adapter.")]
@@ -24,7 +21,7 @@ public sealed record AsciiTree(
 		    content: new XElement(
 			    "pre",
 			    new XAttribute("style", "font-family:Consolas,monospace;font-size:13px"),
-			    Text
+			    Text.Value
 		    )
 	    );
     }

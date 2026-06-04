@@ -1,7 +1,6 @@
 namespace System.IO;
 
 using Collections.Generic;
-
 using Microsoft.Extensions.FileSystemGlobbing;
 
 public sealed record GlobsOptions(
@@ -14,6 +13,45 @@ public sealed record GlobsOptions(
 		FilterOptions: FilterOptions.Default,
 		SortOptions: SortOptions.Default
 	);
+
+	public GlobPatternMode PatternMode { get; init; } = GlobPatternMode.Merge;
+	public IReadOnlyCollection<string>? IncludePatterns { get; init; }
+	public IReadOnlyCollection<string>? ExcludePatterns { get; init; }
+	public IReadOnlyCollection<string> DefaultIncludePatterns { get; init; } = ["**/*"];
+	public IReadOnlyCollection<string> DefaultExcludePatterns { get; init; } = [
+		".git",
+		"**/node_modules/",
+		"**/{artifacts,.artifacts,obj,bin,.vs}/",
+	];
+	public IReadOnlyCollection<string> EffectiveIncludePatterns => GetEffectivePatterns(IncludePatterns, DefaultIncludePatterns);
+	public IReadOnlyCollection<string> EffectiveExcludePatterns => GetEffectivePatterns(ExcludePatterns, DefaultExcludePatterns);
+
+	private IReadOnlyCollection<string> GetEffectivePatterns(
+		IReadOnlyCollection<string>? patterns,
+		IReadOnlyCollection<string> defaultPatterns
+	) {
+		if (patterns is null) {
+			return defaultPatterns
+				.SelectMany(BraceExpander.Expander.Expand)
+				.ToArray();
+		}
+
+		if (PatternMode is GlobPatternMode.Merge) {
+			return defaultPatterns
+				.Concat(patterns)
+				.SelectMany(BraceExpander.Expander.Expand)
+				.ToArray();
+		}
+
+		return patterns
+			.SelectMany(BraceExpander.Expander.Expand)
+			.ToArray();
+	}
+}
+
+public enum GlobPatternMode {
+	Fallback,
+	Merge,
 }
 
 public sealed record SortOptions(
@@ -33,21 +71,11 @@ public sealed record FilterOptions(
 }
 
 public static class GlobExtensions {
-    public static readonly string[] DefaultIncludePatterns = ["**/*"];
-    public static readonly string[] DefaultExcludePatterns = [
-	    ".git",
-	    "**/node_modules/",
-	    "**/{artifacts,.artifacts,obj,bin,.vs}/",
-    ];
 
 	extension(DirectoryInfo directory) {
 		public IEnumerable<FileInfo> Glob(
-			IEnumerable<string>? includePatterns = null,
-			IEnumerable<string>? excludePatterns = null,
 			GlobsOptions? options = null
 		) {
-			includePatterns ??= DefaultIncludePatterns;
-			excludePatterns ??= DefaultExcludePatterns;
 			options ??= GlobsOptions.Default;
 
 			var matcher = new Matcher(
@@ -55,8 +83,8 @@ public static class GlobExtensions {
 				preserveFilterOrder: options.FilterOptions.PreserveFilterOrder
 			);
 
-			matcher.AddIncludePatterns(includePatterns.SelectMany(BraceExpander.Expander.Expand));
-			matcher.AddExcludePatterns(excludePatterns.SelectMany(BraceExpander.Expander.Expand));
+			matcher.AddIncludePatterns(options.EffectiveIncludePatterns);
+			matcher.AddExcludePatterns(options.EffectiveExcludePatterns);
 
 			var filePaths = matcher.GetResultsInFullPath(directory.FullName);
 

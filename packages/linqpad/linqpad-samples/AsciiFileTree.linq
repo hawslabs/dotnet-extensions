@@ -8,24 +8,17 @@
 </Query>
 
 void Main() {
-	Util.GitRootDirectory?.Glob(
-		includePatterns: [
-			"**/*.{csproj,sln,slnx,props,targets}",
-			"**/*.{cs,json}",
-		],
-		excludePatterns: [
-			".git",
-			"**/*.Designer.cs",
-			"**/*DbContextModelSnapshot.cs",
-			"**/node_modules/",
-			"**/{artifacts,.artifacts,obj,bin,.vs}/",
-		]
-	).ToAsciiTree(new() {
-		SortOrder = TreeSortOrder.AlphabeticalDirectoriesFirst,
-		ShowIcons = true,
-		//ShowLabels = true,
-		ShowLineCounts = true,
-		AlignColumns = true,
-		LineCountIcon = "#️⃣"
-	}).Dump();
+	Util.GetFileTree(
+		rootDirectory: Util.GitRootDirectory!,
+		options: GlobsOptions.Default with {
+			IncludePatterns = [
+				"**/*.{csproj,sln,slnx,props,targets}",
+				"**/*.{cs,json}",
+			],
+			ExcludePatterns = [
+				"**/*.Designer.cs",
+				"**/*DbContextModelSnapshot.cs",
+			],
+		}
+	).ToAsciiTree().Dump();
 }
