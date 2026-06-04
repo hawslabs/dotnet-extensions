@@ -5,12 +5,114 @@ using Nodes;
 public sealed class AsciiTreeFormatter(
 	AsciiTreeFormatterOptions options
 ) : ITreeNodeFormatter {
-    public static readonly AsciiTreeFormatter Default = new(
-	    options: AsciiTreeFormatterOptions.Default
+	public static readonly AsciiTreeFormatter Default = new(
+		options: AsciiTreeFormatterOptions.Default
 	);
 
 	public string Format(TreeNode root) {
 		ArgumentNullException.ThrowIfNull(root);
+
+		return options.AlignColumns
+			? FormatWithGrid(root)
+			: FormatLegacy(root);
+	}
+
+	private string FormatWithGrid(TreeNode root) {
+		var rows = BuildRows(root);
+		var maxLineColumnWidth = options.ShowLineCounts
+			? GetMaxLineColumnWidth(root)
+			: 0;
+		var grid = new AsciiGrid {
+			ColumnSpacing = 0,
+		};
+
+		for (var rowIndex = 0; rowIndex < rows.Count; rowIndex++) {
+			var row = rows[rowIndex];
+			var treePadding = options.ShowLineCounts
+				? options.ColumnSeparator.Length
+				: row.ShowLabel
+					? options.LabelSeparator.Length
+					: 0;
+
+			grid.AddCell(new AsciiCell(row.LeftText) {
+				Row = rowIndex,
+				Column = 0,
+				PaddingRight = treePadding,
+			});
+
+			if (options.ShowLineCounts) {
+				grid.AddCell(new AsciiCell(FormatLineCount(row.LineCount, maxLineColumnWidth)) {
+					Row = rowIndex,
+					Column = 1,
+					PaddingRight = row.ShowLabel ? options.LabelSeparator.Length : 0,
+				});
+			}
+
+			if (row.ShowLabel) {
+				grid.AddCell(new AsciiCell(FormatLabelCount(row.LabelCount)) {
+					Row = rowIndex,
+					Column = options.ShowLineCounts ? 2 : 1,
+				});
+			}
+		}
+
+		return grid.Render();
+	}
+
+	private List<TreeRow> BuildRows(TreeNode root) {
+		var rows = new List<TreeRow>();
+
+		rows.Add(CreateRow(root, GetRootLeftText(root), forceShowLabel: true));
+		AddChildRows(root, indent: "", rows);
+
+		return rows;
+	}
+
+	private void AddChildRows(TreeNode node, string indent, List<TreeRow> rows) {
+		var children = GetSortedChildren(node);
+
+		for (var i = 0; i < children.Count; i++) {
+			var child = children[i];
+			var isLast = i == children.Count - 1;
+			var connector = isLast ? "└── " : "├── ";
+			var leftText = indent + connector + GetIcon(child) + child.Name;
+
+			rows.Add(CreateRow(child, leftText, forceShowLabel: false));
+			AddChildRows(child, indent + (isLast ? "    " : "│   "), rows);
+		}
+	}
+
+	private TreeRow CreateRow(TreeNode node, string leftText, bool forceShowLabel) {
+		var labelCount = GetDisplayLabelCount(node);
+		var showLabel = options.ShowLabels && (forceShowLabel || labelCount > 0 || options.ShowZeroLabelCounts);
+
+		return new(
+			leftText,
+			GetDisplayLineCount(node),
+			labelCount,
+			showLabel
+		);
+	}
+
+	private int GetMaxLineColumnWidth(TreeNode root) {
+		var maxLineColumnWidth = FormatNumber(GetDisplayLineCount(root)).Length;
+		MeasureLineCounts(root, ref maxLineColumnWidth);
+
+		return maxLineColumnWidth;
+	}
+
+	private void MeasureLineCounts(TreeNode node, ref int maxLineColumnWidth) {
+		foreach (var child in GetSortedChildren(node)) {
+			maxLineColumnWidth = Math.Max(maxLineColumnWidth, FormatNumber(GetDisplayLineCount(child)).Length);
+			MeasureLineCounts(child, ref maxLineColumnWidth);
+		}
+	}
+
+	private string FormatLabelCount(int labelCount) {
+		return options.LabelIcon + labelCount.ToString(options.NumberFormat, options.Culture);
+	}
+
+	private string FormatLegacy(TreeNode root) {
 
 		var maxNameColumnWidth = GetRootLeftText(root).Length;
 		var maxLineColumnWidth = options.ShowLineCounts
@@ -201,4 +303,11 @@ public sealed class AsciiTreeFormatter(
 			? number
 			: options.LineCountIcon + number;
 	}
+
+	private readonly record struct TreeRow(
+		string LeftText,
+		int LineCount,
+		int LabelCount,
+		bool ShowLabel
+	);
 }

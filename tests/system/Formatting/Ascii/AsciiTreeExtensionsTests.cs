@@ -86,6 +86,34 @@ public sealed class AsciiTreeExtensionsTests {
 	}
 
 	[Fact]
+	public void ToAsciiTree_ShowLabels_RendersLabelSection() {
+		using var temp = new TestDirectory();
+		temp.CreateFile("src/App.cs", "label_app\nConsole.WriteLine();");
+
+		var tree = temp.Root.GetFiles("*", SearchOption.AllDirectories).ToAsciiTree(new() {
+			ShowIcons = false,
+			ShowLabels = true,
+			ShowLineCounts = true,
+			LineCountIcon = null,
+			LabelIcon = "#",
+			AlignColumns = true,
+			Culture = CultureInfo.InvariantCulture,
+		});
+
+		var maxNameColumnWidth = Math.Max("src".Length, "└── App.cs".Length);
+
+		tree.RootPath.Should().Be(Path.Combine(temp.Root.FullName, "src"));
+		tree.Text.Value.Should().Be(
+			string.Join(
+				Environment.NewLine,
+				$"{"src".PadRight(maxNameColumnWidth)}  2  #1",
+				$"{"└── App.cs".PadRight(maxNameColumnWidth)}  2  #1",
+				""
+			)
+		);
+	}
+
+	[Fact]
 	public void ToAsciiTree_RootPathIsProvided_UsesProvidedRootPath() {
 		using var temp = new TestDirectory();
 		temp.CreateFile("src/App.cs", "Console.WriteLine();");
