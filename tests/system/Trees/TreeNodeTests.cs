@@ -2,9 +2,7 @@ namespace HawsLabs.Extensions.Tests.Trees;
 
 using System.Trees.Formatting;
 using System.Trees.Nodes;
-
 using FluentAssertions;
-
 using Xunit;
 
 public sealed class TreeNodeTests {

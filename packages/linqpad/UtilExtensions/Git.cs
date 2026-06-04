@@ -1,4 +1,4 @@
-public static class DetectGitDirectory {
+public static class GitUtils {
 	extension(Util) {
 		public static DirectoryInfo? GitRootDirectory {
 			get {
