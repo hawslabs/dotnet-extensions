@@ -60,9 +60,10 @@ public sealed class AsciiTreeFormatter(
 	}
 
 	private List<TreeRow> BuildRows(TreeNode root) {
-		var rows = new List<TreeRow>();
+		var rows = new List<TreeRow> {
+			CreateRow(root, GetRootLeftText(root), forceShowLabel: true)
+		};
 
-		rows.Add(CreateRow(root, GetRootLeftText(root), forceShowLabel: true));
 		AddChildRows(root, indent: "", rows);
 
 		return rows;
