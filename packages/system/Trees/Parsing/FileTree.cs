@@ -1,6 +1,6 @@
 namespace System.Trees.Parsing;
 
-using Nodes;
+using FileSystemNodes = System.Trees.Nodes.FileSystem;
 
 /// <summary>
 /// Represents a parsed file tree and the root path used to create it.
@@ -9,5 +9,5 @@ using Nodes;
 /// <param name="Root">The root folder node for the parsed tree.</param>
 public sealed record FileTree(
 	string RootPath,
-	FolderTreeNode Root
+	FileSystemNodes.FolderTreeNode Root
 );

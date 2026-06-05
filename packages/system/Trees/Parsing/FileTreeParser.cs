@@ -1,9 +1,13 @@
 namespace System.Trees.Parsing;
 
-using Nodes;
+using ArchiveNodes = System.Trees.Nodes.Archive;
+using FileSystemNodes = System.Trees.Nodes.FileSystem;
+using MSBuildNodes = System.Trees.Nodes.MSBuild;
+using NuGetNodes = System.Trees.Nodes.NuGet;
+using TreeNodes = System.Trees.Nodes;
 
 public static class FileTreeParser {
-	public static FolderTreeNode Parse(IEnumerable<FileInfo> files, FileTreeParseOptions? options = null) {
+	public static FileSystemNodes.FolderTreeNode Parse(IEnumerable<FileInfo> files, FileTreeParseOptions? options = null) {
 		return ParseTree(files, options).Root;
 	}
 
@@ -19,7 +23,7 @@ public static class FileTreeParser {
 		var basePath = Path.GetFullPath(options.BasePath ?? files.FindCommonBasePath(options.PathComparison));
 		var rootName = options.RootName ?? Path.GetFileNameOrPath(basePath);
 
-		var root = new FolderTreeNode(rootName);
+		var root = FileSystemNodes.FolderTreeNode.Parse(rootName);
 
 		foreach (var file in files) {
 			if (options.IgnoreFilesOutsideBasePath && Path.IsOutsideBasePath(basePath, file.FullName, options.PathComparison)) {
@@ -39,11 +43,7 @@ public static class FileTreeParser {
 				folder = folder.GetOrAddFolder(part);
 			}
 
-			var metadata = options.ReadFileMetrics
-				? ReadMetadata(file, relativePath, options)
-				: new(file, file.FullName, relativePath, 0, 0);
-
-			folder.AddOrUpdateFile(parts[^1], metadata.ToFileTreeNode());
+			folder.AddOrUpdateNode(parts[^1], ParseNode(file, relativePath, options));
 		}
 
 		root.ComputeTotals();
@@ -51,38 +51,23 @@ public static class FileTreeParser {
 		return new(basePath, root);
 	}
 
-	private static FileMetadata ReadMetadata(FileInfo file, string relativePath, FileTreeParseOptions options) {
-		try {
-			var lineCount = 0;
-			var labelCount = 0;
-
-			foreach (var line in options.ReadLines(file.FullName)) {
-				lineCount++;
-
-				if (options.LabelPredicate(line)) {
-					labelCount++;
-				}
-			}
-
-			return new(file, file.FullName, relativePath, lineCount, labelCount);
-		} catch when (options.IgnoreFileReadErrors) {
-			return new(file, file.FullName, relativePath, 0, 0);
+	private static TreeNodes.TreeNode ParseNode(FileInfo file, string relativePath, FileTreeParseOptions options) {
+		if (NuGetNodes.NuGetPackageNode.CanParse(file)) {
+			return NuGetNodes.NuGetPackageNode.Parse(file, relativePath);
 		}
-	}
 
-	private readonly record struct FileMetadata(
-		FileInfo File,
-		string FullPath,
-		string RelativePath,
-		int LineCount,
-		int LabelCount
-	) {
-		public FileTreeNode ToFileTreeNode() => new(
-			File,
-			FullPath,
-			RelativePath,
-			LineCount,
-			LabelCount
-		);
+		if (ArchiveNodes.ZipArchiveNode.CanParse(file)) {
+			return ArchiveNodes.ZipArchiveNode.Parse(file, relativePath);
+		}
+
+		if (MSBuildNodes.SolutionNode.CanParse(file)) {
+			return MSBuildNodes.SolutionNode.Parse(file, relativePath);
+		}
+
+		if (MSBuildNodes.ProjectNode.CanParse(file)) {
+			return MSBuildNodes.ProjectNode.Parse(file, relativePath);
+		}
+
+		return FileSystemNodes.FileTreeNode.Parse(file, relativePath, options);
 	}
 }

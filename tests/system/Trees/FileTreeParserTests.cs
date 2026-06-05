@@ -1,6 +1,9 @@
 namespace HawsLabs.Extensions.Tests.Trees;
 
-using System.Trees.Nodes;
+using ArchiveNodes = System.Trees.Nodes.Archive;
+using FileSystemNodes = System.Trees.Nodes.FileSystem;
+using MSBuildNodes = System.Trees.Nodes.MSBuild;
+using NuGetNodes = System.Trees.Nodes.NuGet;
 using System.Trees.Parsing;
 
 using FluentAssertions;
@@ -27,21 +30,62 @@ public sealed class FileTreeParserTests {
 		root.TotalLines.Should().Be(3);
 		root.TotalLabelCount.Should().Be(1);
 
-		var src = root.Children["src"].Should().BeOfType<FolderTreeNode>().Subject;
+		var src = root.Children["src"].Should().BeOfType<FileSystemNodes.FolderTreeNode>().Subject;
 		src.TotalLines.Should().Be(3);
 		src.TotalLabelCount.Should().Be(1);
 
-		var appNode = src.Children["App.cs"].Should().BeOfType<FileTreeNode>().Subject;
+		var appNode = src.Children["App.cs"].Should().BeOfType<FileSystemNodes.FileTreeNode>().Subject;
 		appNode.File.FullName.Should().Be(app.FullName);
 		appNode.FullPath.Should().Be(app.FullName);
 		appNode.RelativePath.Should().Be("src/App.cs");
 		appNode.LineCount.Should().Be(2);
 		appNode.LabelCount.Should().Be(1);
 
-		var readmeNode = src.Children["Readme.md"].Should().BeOfType<FileTreeNode>().Subject;
+		var readmeNode = src.Children["Readme.md"].Should().BeOfType<FileSystemNodes.FileTreeNode>().Subject;
 		readmeNode.RelativePath.Should().Be("src/Readme.md");
 		readmeNode.LineCount.Should().Be(1);
 		readmeNode.LabelCount.Should().Be(0);
+	}
+
+	[Fact]
+	public void Parse_KnownFileTypes_UsesSpecializedNodes() {
+		using var temp = new TestDirectory();
+		var solution = temp.CreateFile("HawsLabs.Extensions.slnx");
+		var project = temp.CreateFile("src/App/App.csproj");
+		var package = temp.CreateFile("artifacts/HawsLabs.Extensions.System.1.2.3-beta.1.nupkg");
+		var zip = temp.CreateFile("artifacts/build.zip");
+
+		var root = FileTreeParser.Parse(
+			[solution, project, package, zip],
+			new() {
+				BasePath = temp.Root.FullName,
+			}
+		);
+
+		root.Children["HawsLabs.Extensions.slnx"]
+			.Should().BeOfType<MSBuildNodes.SolutionNode>()
+			.Which.RelativePath.Should().Be("HawsLabs.Extensions.slnx");
+
+		var app = root.Children["src"]
+			.Should().BeOfType<FileSystemNodes.FolderTreeNode>()
+			.Subject.Children["App"].Should().BeOfType<FileSystemNodes.FolderTreeNode>().Subject;
+
+		app.Children["App.csproj"]
+			.Should().BeOfType<MSBuildNodes.ProjectNode>()
+			.Which.File.FullName.Should().Be(project.FullName);
+
+		var artifacts = root.Children["artifacts"].Should().BeOfType<FileSystemNodes.FolderTreeNode>().Subject;
+
+		var packageNode = artifacts.Children["HawsLabs.Extensions.System.1.2.3-beta.1.nupkg"]
+			.Should().BeOfType<NuGetNodes.NuGetPackageNode>().Subject;
+
+		packageNode.File.FullName.Should().Be(package.FullName);
+		packageNode.PackageId.Should().Be("HawsLabs.Extensions.System");
+		packageNode.PackageVersion.Should().Be("1.2.3-beta.1");
+
+		artifacts.Children["build.zip"]
+			.Should().BeOfType<ArchiveNodes.ZipArchiveNode>()
+			.Which.File.FullName.Should().Be(zip.FullName);
 	}
 
 	[Fact]
@@ -57,8 +101,8 @@ public sealed class FileTreeParserTests {
 			}
 		);
 
-		var src = root.Children["src"].Should().BeOfType<FolderTreeNode>().Subject;
-		var app = src.Children["App.cs"].Should().BeOfType<FileTreeNode>().Subject;
+		var src = root.Children["src"].Should().BeOfType<FileSystemNodes.FolderTreeNode>().Subject;
+		var app = src.Children["App.cs"].Should().BeOfType<FileSystemNodes.FileTreeNode>().Subject;
 
 		app.LineCount.Should().Be(0);
 		app.LabelCount.Should().Be(0);
@@ -81,10 +125,10 @@ public sealed class FileTreeParserTests {
 			}
 		);
 
-		var src = root.Children["src"].Should().BeOfType<FolderTreeNode>().Subject;
+		var src = root.Children["src"].Should().BeOfType<FileSystemNodes.FolderTreeNode>().Subject;
 
 		src.Children.Values.Should().ContainSingle()
-			.Which.Should().BeOfType<FileTreeNode>()
+			.Which.Should().BeOfType<FileSystemNodes.FileTreeNode>()
 			.Which.File.FullName.Should().Be(inside.FullName);
 	}
 
@@ -102,8 +146,8 @@ public sealed class FileTreeParserTests {
 			}
 		);
 
-		var src = root.Children["src"].Should().BeOfType<FolderTreeNode>().Subject;
-		var app = src.Children["App.cs"].Should().BeOfType<FileTreeNode>().Subject;
+		var src = root.Children["src"].Should().BeOfType<FileSystemNodes.FolderTreeNode>().Subject;
+		var app = src.Children["App.cs"].Should().BeOfType<FileSystemNodes.FileTreeNode>().Subject;
 
 		app.LineCount.Should().Be(0);
 		root.TotalLines.Should().Be(0);
@@ -111,7 +155,7 @@ public sealed class FileTreeParserTests {
 
 	[Fact]
 	public void GetOrAddFolder_ChildNameDiffersOnlyByCase_ReturnsExistingFolder() {
-		var root = new FolderTreeNode("root");
+		var root = new FileSystemNodes.FolderTreeNode("root");
 		var folder = root.GetOrAddFolder("src");
 
 		var sameFolder = root.GetOrAddFolder("SRC");

@@ -1,8 +1,14 @@
-namespace System.Trees.Nodes;
+namespace System.Trees.Nodes.FileSystem;
 
 public sealed record FolderTreeNode(string Name) : TreeNode(Name) {
 	public int TotalLines { get; private set; }
 	public int TotalLabelCount { get; private set; }
+
+	public static new FolderTreeNode Parse(string name) {
+		ArgumentException.ThrowIfNullOrWhiteSpace(name);
+
+		return new(name);
+	}
 
 	public FolderTreeNode GetOrAddFolder(string name) {
 		if (Children.TryGetValue(name, out var child)) {
@@ -10,18 +16,18 @@ public sealed record FolderTreeNode(string Name) : TreeNode(Name) {
 			   ?? throw new InvalidOperationException($"A non-folder node named '{name}' already exists under '{Name}'.");
 		}
 
-		var newFolder = new FolderTreeNode(name);
+		var newFolder = Parse(name);
 		Children[name] = newFolder;
 
 		return newFolder;
 	}
 
-	internal void AddOrUpdateFile(string name, FileTreeNode file) {
-		if (Children.TryGetValue(name, out var child) && child is not FileTreeNode) {
-			throw new InvalidOperationException($"A non-file node named '{name}' already exists under '{Name}'.");
+	internal void AddOrUpdateNode(string name, TreeNode node) {
+		if (Children.TryGetValue(name, out var child) && child is FolderTreeNode) {
+			throw new InvalidOperationException($"A folder node named '{name}' already exists under '{Name}'.");
 		}
 
-		Children[name] = file;
+		Children[name] = node;
 	}
 
 	internal void ComputeTotals() {

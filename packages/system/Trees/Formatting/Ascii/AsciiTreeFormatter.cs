@@ -1,6 +1,7 @@
 namespace System.Trees.Formatting.Ascii;
 
-using Nodes;
+using System.Trees.Nodes;
+using FileSystemNodes = System.Trees.Nodes.FileSystem;
 
 public sealed class AsciiTreeFormatter(
 	AsciiTreeFormatterOptions options
@@ -241,7 +242,7 @@ public sealed class AsciiTreeFormatter(
 	private IReadOnlyList<TreeNode> GetSortedChildren(TreeNode node) {
 		return options.SortOrder switch {
 			TreeSortOrder.AlphabeticalDirectoriesFirst => node.Children.Values
-				.OrderBy(child => child is FileTreeNode)
+				.OrderBy(IsFileNode)
 				.ThenBy(child => child.Name, options.NameComparer)
 				.ToList(),
 
@@ -272,23 +273,27 @@ public sealed class AsciiTreeFormatter(
 			return "";
 		}
 
-		return node is FileTreeNode
+		return IsFileNode(node)
 			? options.FileIcon
 			: options.DirectoryIcon;
 	}
 
+	private static bool IsFileNode(TreeNode node) {
+		return node is not FileSystemNodes.FolderTreeNode;
+	}
+
 	private int GetDisplayLineCount(TreeNode node) {
 		return node switch {
-			FileTreeNode file => file.LineCount,
-			FolderTreeNode folder => folder.TotalLines,
+			FileSystemNodes.FileTreeNode file => file.LineCount,
+			FileSystemNodes.FolderTreeNode folder => folder.TotalLines,
 			_ => 0,
 		};
 	}
 
 	private int GetDisplayLabelCount(TreeNode node) {
 		return node switch {
-			FileTreeNode file => file.LabelCount,
-			FolderTreeNode folder => folder.TotalLabelCount,
+			FileSystemNodes.FileTreeNode file => file.LabelCount,
+			FileSystemNodes.FolderTreeNode folder => folder.TotalLabelCount,
 			_ => 0,
 		};
 	}
