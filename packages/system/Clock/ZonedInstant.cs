@@ -1,3 +1,5 @@
+using System.Clock.Conversions;
+
 namespace System.Clock;
 
 public readonly record struct ZonedInstant(
@@ -91,6 +93,18 @@ public readonly record struct ZonedInstant(
 
 	public ZonedInstant WithTimeZone(TimeZoneInfo timeZone) {
 		return new(Instant, timeZone);
+	}
+
+	public ZonedInstant ToTimeZone(TimeZoneId timeZone) {
+		return WithTimeZone(timeZone.Info);
+	}
+
+	public ZonedInstant ToTimeZone(WindowsTimeZoneId timeZone) {
+		return WithTimeZone(timeZone.Info);
+	}
+
+	public ZonedInstant ToTimeZone(IanaTimeZoneId timeZone) {
+		return WithTimeZone(timeZone.Info);
 	}
 
 	public override string ToString() {

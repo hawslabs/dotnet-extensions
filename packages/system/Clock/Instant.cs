@@ -1,3 +1,5 @@
+using System.Clock.Conversions;
+
 namespace System.Clock;
 
 public readonly record struct Instant(long Ticks) : IComparable<Instant> {

@@ -1,5 +1,4 @@
-namespace System.Clock;
-
+namespace System.Clock.Conversions;
 
 public abstract class AmbiguousTimeHandling {
 	public static readonly AmbiguousTimeHandling Throw = new ThrowAmbiguousTimeHandling();

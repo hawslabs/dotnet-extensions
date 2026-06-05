@@ -1,10 +1,11 @@
 <Query Kind="Program">
   <Reference Relative="..\..\..\.artifacts\bin\HawsLabs.Extensions.LINQPad\debug\HawsLabs.Extensions.LINQPad.dll">D:\hawslabs\dotnet-extensions\.artifacts\bin\HawsLabs.Extensions.LINQPad\debug\HawsLabs.Extensions.LINQPad.dll</Reference>
   <Reference Relative="..\..\..\.artifacts\bin\HawsLabs.Extensions.LINQPad\debug\HawsLabs.Extensions.System.dll">D:\hawslabs\dotnet-extensions\.artifacts\bin\HawsLabs.Extensions.LINQPad\debug\HawsLabs.Extensions.System.dll</Reference>
-  <Namespace>System.Trees.Formatting</Namespace>
-  <Namespace>System.Trees.Formatting.Ascii</Namespace>
+  <Namespace>System.Clock</Namespace>
   <Namespace>System.Trees</Namespace>
   <Namespace>System.Trees.FileSystem.Parsing</Namespace>
+  <Namespace>System.Trees.Formatting</Namespace>
+  <Namespace>System.Trees.Formatting.Ascii</Namespace>
 </Query>
 
 void Main() {

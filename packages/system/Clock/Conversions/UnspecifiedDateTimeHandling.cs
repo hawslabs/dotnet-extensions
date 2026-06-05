@@ -1,4 +1,4 @@
-namespace System.Clock;
+namespace System.Clock.Conversions;
 
 public abstract class UnspecifiedDateTimeHandling {
 	public static readonly UnspecifiedDateTimeHandling Throw = new ThrowUnspecifiedDateTimeHandling();
