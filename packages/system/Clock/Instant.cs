@@ -15,9 +15,9 @@ public readonly record struct Instant(long Ticks) : IComparable<Instant> {
 
 	public static Instant FromDateTime(
 		DateTime value,
-		UnspecifiedDateTimeHandling unspecifiedHandling = UnspecifiedDateTimeHandling.Throw
+		UnspecifiedDateTimeHandling? unspecifiedHandling = null
 	) {
-		return new(DateTimeNormalization.ToUtc(value, unspecifiedHandling).Ticks);
+		return new(value.ToUtc(unspecifiedHandling).Ticks);
 	}
 
 	public static Instant FromDateTimeOffset(DateTimeOffset value) {
@@ -32,7 +32,7 @@ public readonly record struct Instant(long Ticks) : IComparable<Instant> {
 		return OffsetValue.ToUnixTimeMilliseconds();
 	}
 
-	public ZonedDateTime InZone(TimeZoneInfo timeZone) {
+	public ZonedInstant InZone(TimeZoneInfo timeZone) {
 		return new(this, timeZone);
 	}
 
@@ -48,24 +48,13 @@ public readonly record struct Instant(long Ticks) : IComparable<Instant> {
 		return Value.ToString("O", CultureInfo.InvariantCulture);
 	}
 
-	public static bool operator <(Instant left, Instant right) =>
-		left.Ticks < right.Ticks;
-
-	public static bool operator <=(Instant left, Instant right) =>
-		left.Ticks <= right.Ticks;
-
-	public static bool operator >(Instant left, Instant right) =>
-		left.Ticks > right.Ticks;
-
-	public static bool operator >=(Instant left, Instant right) =>
-		left.Ticks >= right.Ticks;
-
-	public static TimeSpan operator -(Instant left, Instant right) =>
-		left.Value - right.Value;
-
-	public static Instant operator +(Instant value, TimeSpan duration) =>
-		value.Add(duration);
-
-	public static Instant operator -(Instant value, TimeSpan duration) =>
-		value.Add(-duration);
+    public static implicit operator DateTime(Instant instant) => instant.Value;
+    public static implicit operator DateTimeOffset(Instant instant) => instant.OffsetValue;
+	public static bool operator <(Instant left, Instant right) => left.Ticks < right.Ticks;
+	public static bool operator <=(Instant left, Instant right) => left.Ticks <= right.Ticks;
+	public static bool operator >(Instant left, Instant right) => left.Ticks > right.Ticks;
+	public static bool operator >=(Instant left, Instant right) => left.Ticks >= right.Ticks;
+	public static TimeSpan operator -(Instant left, Instant right) => left.Value - right.Value;
+	public static Instant operator +(Instant value, TimeSpan duration) => value.Add(duration);
+	public static Instant operator -(Instant value, TimeSpan duration) => value.Add(-duration);
 }

@@ -2,8 +2,8 @@ namespace System.Clock;
 
 public static class TimeProviderEx {
 	extension(TimeProvider time) {
-		public ZonedDateTime GetZoned(TimeZoneInfo timeZone) {
-			return ZonedDateTime.Now(timeZone, time);
+		public ZonedInstant GetZoned(TimeZoneInfo timeZone) {
+			return ZonedInstant.Now(timeZone, time);
 		}
 
 		public Instant GetInstant() {

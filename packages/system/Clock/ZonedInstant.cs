@@ -1,8 +1,9 @@
 namespace System.Clock;
 
-public readonly record struct ZonedDateTime {
-	public Instant Instant { get; }
-	public TimeZoneInfo TimeZone { get; }
+public readonly record struct ZonedInstant(
+	Instant Instant,
+	TimeZoneInfo TimeZone
+) {
 	public string TimeZoneId => TimeZone.Id;
 
 	public DateTime LocalDateTime {
@@ -19,30 +20,25 @@ public readonly record struct ZonedDateTime {
 
 	public TimeSpan Offset => TimeZone.GetUtcOffset(Instant.Value);
 
-	public ZonedDateTime(Instant instant, TimeZoneInfo timeZone) {
-		Instant = instant;
-		TimeZone = timeZone;
-	}
-
-	public static ZonedDateTime Now(TimeZoneInfo timeZone) {
+	public static ZonedInstant Now(TimeZoneInfo timeZone) {
 		return Now(timeZone, TimeProvider.System);
 	}
 
-	public static ZonedDateTime Now(TimeZoneInfo timeZone, TimeProvider timeProvider) {
+	public static ZonedInstant Now(TimeZoneInfo timeZone, TimeProvider timeProvider) {
 		return timeProvider.GetInstant().InZone(timeZone);
 	}
 
-	public static ZonedDateTime FromInstant(
+	public static ZonedInstant FromInstant(
 		Instant instant,
 		TimeZoneInfo timeZone
 	) {
 		return new(instant, timeZone);
 	}
 
-	public static ZonedDateTime FromDateTime(
+	public static ZonedInstant FromDateTime(
 		DateTime value,
 		TimeZoneInfo timeZone,
-		UnspecifiedDateTimeHandling unspecifiedHandling = UnspecifiedDateTimeHandling.Throw
+		UnspecifiedDateTimeHandling? unspecifiedHandling = null
 	) {
 		return new(
 			Instant.FromDateTime(value, unspecifiedHandling),
@@ -50,7 +46,7 @@ public readonly record struct ZonedDateTime {
 		);
 	}
 
-	public static ZonedDateTime FromDateTimeOffset(
+	public static ZonedInstant FromDateTimeOffset(
 		DateTimeOffset value,
 		TimeZoneInfo timeZone
 	) {
@@ -60,11 +56,13 @@ public readonly record struct ZonedDateTime {
 		);
 	}
 
-	public static ZonedDateTime FromLocalDateTime(
+	public static ZonedInstant FromLocalDateTime(
 		DateTime localDateTime,
 		TimeZoneInfo timeZone,
-		AmbiguousTimeHandling ambiguousTimeHandling = AmbiguousTimeHandling.Throw
+		AmbiguousTimeHandling? ambiguousTimeHandling = null
 	) {
+		ambiguousTimeHandling ??= AmbiguousTimeHandling.Throw;
+
 		var local = DateTime.SpecifyKind(localDateTime, DateTimeKind.Unspecified);
 
 		if (timeZone.IsInvalidTime(local)) {
@@ -78,16 +76,7 @@ public readonly record struct ZonedDateTime {
 
 		if (timeZone.IsAmbiguousTime(local)) {
 			var offsets = timeZone.GetAmbiguousTimeOffsets(local);
-
-			offset = ambiguousTimeHandling switch {
-				AmbiguousTimeHandling.EarlierInstant => offsets.Max(),
-				AmbiguousTimeHandling.LaterInstant => offsets.Min(),
-
-				_ => throw new ArgumentException(
-					"The supplied local date/time is ambiguous in the given time zone, probably because of a daylight-saving transition.",
-					nameof(localDateTime)
-				),
-			};
+			offset = ambiguousTimeHandling.GetOffset(localDateTime, offsets);
 		} else {
 			offset = timeZone.GetUtcOffset(local);
 		}
@@ -100,7 +89,7 @@ public readonly record struct ZonedDateTime {
 		);
 	}
 
-	public ZonedDateTime WithTimeZone(TimeZoneInfo timeZone) {
+	public ZonedInstant WithTimeZone(TimeZoneInfo timeZone) {
 		return new(Instant, timeZone);
 	}
 
