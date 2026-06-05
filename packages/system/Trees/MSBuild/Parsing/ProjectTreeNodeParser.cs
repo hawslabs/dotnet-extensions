@@ -14,8 +14,6 @@ public sealed class ProjectTreeNodeParser : ITreeNodeParser {
 	};
 
 	public TreeNodeParserMatch Match(TreeNodeParseContext context) {
-		ArgumentNullException.ThrowIfNull(context);
-
 		if (!ProjectExtensions.Contains(context.File.Extension)) {
 			return TreeNodeParserMatch.None;
 		}
@@ -24,8 +22,6 @@ public sealed class ProjectTreeNodeParser : ITreeNodeParser {
 	}
 
 	public TreeNode Parse(TreeNodeParseContext context) {
-		ArgumentNullException.ThrowIfNull(context);
-
 		return MSBuildNodes.ProjectNode.Parse(context.File, context.RelativePath);
 	}
 }

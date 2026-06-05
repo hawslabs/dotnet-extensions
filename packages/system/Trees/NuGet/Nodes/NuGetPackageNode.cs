@@ -12,7 +12,6 @@ public sealed record NuGetPackageNode(
 	public override string? Icon { get; init; } = "📦";
 
 	public static new NuGetPackageNode Parse(FileInfo file, string relativePath) {
-		ArgumentNullException.ThrowIfNull(file);
 		ArgumentException.ThrowIfNullOrWhiteSpace(relativePath);
 
 		var fileName = Path.GetFileNameWithoutExtension(file.Name);

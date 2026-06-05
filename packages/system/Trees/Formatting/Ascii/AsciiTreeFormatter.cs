@@ -11,8 +11,6 @@ public sealed class AsciiTreeFormatter(
 	);
 
 	public string Format(TreeNode root) {
-		ArgumentNullException.ThrowIfNull(root);
-
 		return options.AlignColumns
 			? FormatWithGrid(root)
 			: FormatLegacy(root);
@@ -35,14 +33,14 @@ public sealed class AsciiTreeFormatter(
 					? options.LabelSeparator.Length
 					: 0;
 
-			grid.AddCell(new AsciiCell(row.LeftText) {
+			grid.AddCell(new(row.LeftText) {
 				Row = rowIndex,
 				Column = 0,
 				PaddingRight = treePadding,
 			});
 
 			if (options.ShowLineCounts) {
-				grid.AddCell(new AsciiCell(FormatLineCount(row.LineCount, maxLineColumnWidth)) {
+				grid.AddCell(new(FormatLineCount(row.LineCount, maxLineColumnWidth)) {
 					Row = rowIndex,
 					Column = 1,
 					PaddingRight = row.ShowLabel ? options.LabelSeparator.Length : 0,
@@ -50,7 +48,7 @@ public sealed class AsciiTreeFormatter(
 			}
 
 			if (row.ShowLabel) {
-				grid.AddCell(new AsciiCell(FormatLabelCount(row.LabelCount)) {
+				grid.AddCell(new(FormatLabelCount(row.LabelCount)) {
 					Row = rowIndex,
 					Column = options.ShowLineCounts ? 2 : 1,
 				});

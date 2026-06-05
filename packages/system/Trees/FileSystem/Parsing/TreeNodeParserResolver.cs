@@ -6,14 +6,10 @@ public sealed class TreeNodeParserResolver {
 	private readonly IReadOnlyList<ITreeNodeParser> parsers;
 
 	public TreeNodeParserResolver(IEnumerable<ITreeNodeParser> parsers) {
-		ArgumentNullException.ThrowIfNull(parsers);
-
 		this.parsers = parsers.ToArray();
 	}
 
 	public TreeNode Parse(TreeNodeParseContext context) {
-		ArgumentNullException.ThrowIfNull(context);
-
 		var matches = parsers
 			.Select(parser => new ParserCandidate(parser, parser.Match(context)))
 			.Where(candidate => candidate.Match.IsMatch)

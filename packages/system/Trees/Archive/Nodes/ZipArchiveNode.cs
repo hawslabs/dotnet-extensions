@@ -10,7 +10,6 @@ public record ZipArchiveNode(
 	public override string? Icon { get; init; } = "🗜️";
 
 	public static ZipArchiveNode Parse(FileInfo file, string relativePath) {
-		ArgumentNullException.ThrowIfNull(file);
 		ArgumentException.ThrowIfNullOrWhiteSpace(relativePath);
 
 		return new(file, file.FullName, relativePath);

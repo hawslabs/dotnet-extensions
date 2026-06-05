@@ -8,8 +8,6 @@ public static class FileTreeParser {
 	}
 
 	public static FileTree ParseTree(IEnumerable<FileInfo> files, FileTreeParseOptions? options = null) {
-		ArgumentNullException.ThrowIfNull(files);
-
 		options ??= new();
 
 		if (options.SortInputPaths) {

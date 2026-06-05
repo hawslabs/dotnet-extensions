@@ -13,9 +13,7 @@ public sealed record FileTreeNode(
 	public override string? Icon { get; init; } = "📄";
 
 	public static FileTreeNode Parse(FileInfo file, string relativePath, FileTreeParseOptions options) {
-		ArgumentNullException.ThrowIfNull(file);
 		ArgumentException.ThrowIfNullOrWhiteSpace(relativePath);
-		ArgumentNullException.ThrowIfNull(options);
 
 		if (!options.ReadFileMetrics) {
 			return new(file, file.FullName, relativePath);

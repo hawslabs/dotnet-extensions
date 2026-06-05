@@ -11,8 +11,6 @@ public sealed class AsciiGrid {
 	public int ColumnSpacing { get; init; } = 1;
 
 	public AsciiGrid AddCell(AsciiCell cell) {
-		ArgumentNullException.ThrowIfNull(cell);
-
 		cells.Add(cell);
 
 		return this;

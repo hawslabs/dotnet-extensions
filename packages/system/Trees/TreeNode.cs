@@ -14,7 +14,6 @@ public record TreeNode(string Name) {
 	}
 
 	public string Format(ITreeNodeFormatter formatter) {
-		ArgumentNullException.ThrowIfNull(formatter);
 		return formatter.Format(this);
 	}
 

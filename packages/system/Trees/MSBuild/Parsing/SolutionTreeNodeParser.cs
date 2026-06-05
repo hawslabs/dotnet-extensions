@@ -11,8 +11,6 @@ public sealed class SolutionTreeNodeParser : ITreeNodeParser {
 	};
 
 	public TreeNodeParserMatch Match(TreeNodeParseContext context) {
-		ArgumentNullException.ThrowIfNull(context);
-
 		if (!SolutionExtensions.Contains(context.File.Extension)) {
 			return TreeNodeParserMatch.None;
 		}
@@ -21,8 +19,6 @@ public sealed class SolutionTreeNodeParser : ITreeNodeParser {
 	}
 
 	public TreeNode Parse(TreeNodeParseContext context) {
-		ArgumentNullException.ThrowIfNull(context);
-
 		return MSBuildNodes.SolutionNode.Parse(context.File, context.RelativePath);
 	}
 }

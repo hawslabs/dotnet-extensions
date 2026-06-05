@@ -10,7 +10,6 @@ public sealed record SolutionNode(
 	public override string? Icon { get; init; } = "🧩";
 
 	public static SolutionNode Parse(FileInfo file, string relativePath) {
-		ArgumentNullException.ThrowIfNull(file);
 		ArgumentException.ThrowIfNullOrWhiteSpace(relativePath);
 
 		return new(file, file.FullName, relativePath);

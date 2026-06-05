@@ -11,8 +11,6 @@ public sealed class NuGetPackageTreeNodeParser : ITreeNodeParser {
 	};
 
 	public TreeNodeParserMatch Match(TreeNodeParseContext context) {
-		ArgumentNullException.ThrowIfNull(context);
-
 		if (!PackageExtensions.Contains(context.File.Extension)) {
 			return TreeNodeParserMatch.None;
 		}
@@ -21,8 +19,6 @@ public sealed class NuGetPackageTreeNodeParser : ITreeNodeParser {
 	}
 
 	public TreeNode Parse(TreeNodeParseContext context) {
-		ArgumentNullException.ThrowIfNull(context);
-
 		return NuGetNodes.NuGetPackageNode.Parse(context.File, context.RelativePath);
 	}
 }
