@@ -1,6 +1,6 @@
 namespace System.Trees;
 
-using FileSystemNodes = System.Trees.Nodes.FileSystem;
+using FileSystemNodes = System.Trees.FileSystem.Nodes;
 
 using Parsing;
 

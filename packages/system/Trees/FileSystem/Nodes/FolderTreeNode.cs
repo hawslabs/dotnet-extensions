@@ -1,4 +1,6 @@
-namespace System.Trees.Nodes.FileSystem;
+namespace System.Trees.FileSystem.Nodes;
+
+using System.Trees;
 
 public sealed record FolderTreeNode(string Name) : TreeNode(Name) {
 	public override string? Icon { get; init; } = "📁";

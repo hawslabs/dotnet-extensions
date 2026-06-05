@@ -1,6 +1,6 @@
 namespace System.Trees.Parsing;
 
-using FileSystemNodes = System.Trees.Nodes.FileSystem;
+using FileSystemNodes = System.Trees.FileSystem.Nodes;
 
 public static class FileTreeParser {
 	public static FileSystemNodes.FolderTreeNode Parse(IEnumerable<FileInfo> files, FileTreeParseOptions? options = null) {

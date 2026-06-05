@@ -1,7 +1,7 @@
 namespace System.Trees.Formatting.Ascii;
 
-using System.Trees.Nodes;
-using FileSystemNodes = System.Trees.Nodes.FileSystem;
+using System.Trees;
+using FileSystemNodes = System.Trees.FileSystem.Nodes;
 
 public sealed class AsciiTreeFormatter(
 	AsciiTreeFormatterOptions options

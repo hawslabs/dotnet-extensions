@@ -1,7 +1,7 @@
 namespace System.Trees.Parsing;
 
-using System.Trees.Nodes;
-using NuGetNodes = System.Trees.Nodes.NuGet;
+using System.Trees;
+using NuGetNodes = System.Trees.NuGet.Nodes;
 
 public sealed class NuGetPackageTreeNodeParser : ITreeNodeParser {
 	private static readonly HashSet<string> PackageExtensions = new(StringComparer.OrdinalIgnoreCase) {

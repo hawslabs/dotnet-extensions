@@ -1,10 +1,10 @@
 namespace HawsLabs.Extensions.Tests.Trees;
 
-using ArchiveNodes = System.Trees.Nodes.Archive;
-using FileSystemNodes = System.Trees.Nodes.FileSystem;
-using MSBuildNodes = System.Trees.Nodes.MSBuild;
-using NuGetNodes = System.Trees.Nodes.NuGet;
-using TreeNodes = System.Trees.Nodes;
+using ArchiveNodes = System.Trees.Archive.Nodes;
+using FileSystemNodes = System.Trees.FileSystem.Nodes;
+using MSBuildNodes = System.Trees.MSBuild.Nodes;
+using NuGetNodes = System.Trees.NuGet.Nodes;
+using TreeNodes = System.Trees;
 using System.Trees.Parsing;
 
 using FluentAssertions;

@@ -1,6 +1,6 @@
 namespace System.Trees.Parsing;
 
-using FileSystemNodes = System.Trees.Nodes.FileSystem;
+using FileSystemNodes = System.Trees.FileSystem.Nodes;
 
 /// <summary>
 /// Represents a parsed file tree and the root path used to create it.

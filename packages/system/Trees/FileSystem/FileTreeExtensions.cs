@@ -1,3 +1,5 @@
+namespace System.Trees.FileSystem;
+
 using System.Trees.Parsing;
 
 public static class FileTreeExtensions {

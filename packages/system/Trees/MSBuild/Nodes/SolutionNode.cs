@@ -1,13 +1,15 @@
-namespace System.Trees.Nodes.MSBuild;
+namespace System.Trees.MSBuild.Nodes;
 
-public sealed record ProjectNode(
+using System.Trees;
+
+public sealed record SolutionNode(
 	FileInfo File,
 	string FullPath,
 	string RelativePath
 ) : TreeNode(File.Name) {
-	public override string? Icon { get; init; } = "⚙️";
+	public override string? Icon { get; init; } = "🧩";
 
-	public static ProjectNode Parse(FileInfo file, string relativePath) {
+	public static SolutionNode Parse(FileInfo file, string relativePath) {
 		ArgumentNullException.ThrowIfNull(file);
 		ArgumentException.ThrowIfNullOrWhiteSpace(relativePath);
 

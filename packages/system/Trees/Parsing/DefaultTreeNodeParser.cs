@@ -1,7 +1,7 @@
 namespace System.Trees.Parsing;
 
-using System.Trees.Nodes;
-using FileSystemNodes = System.Trees.Nodes.FileSystem;
+using System.Trees;
+using FileSystemNodes = System.Trees.FileSystem.Nodes;
 
 public sealed class DefaultTreeNodeParser : ITreeNodeParser {
 	public TreeNodeParserMatch Match(TreeNodeParseContext context) {

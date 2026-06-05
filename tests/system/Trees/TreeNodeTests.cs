@@ -1,7 +1,7 @@
 namespace HawsLabs.Extensions.Tests.Trees;
 
 using System.Trees.Formatting;
-using System.Trees.Nodes;
+using System.Trees;
 using FluentAssertions;
 using Xunit;
 

@@ -1,4 +1,6 @@
-namespace System.Trees.Nodes.Archive;
+namespace System.Trees.Archive.Nodes;
+
+using System.Trees;
 
 public record ZipArchiveNode(
 	FileInfo File,

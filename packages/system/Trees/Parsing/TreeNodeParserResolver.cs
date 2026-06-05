@@ -1,6 +1,6 @@
 namespace System.Trees.Parsing;
 
-using System.Trees.Nodes;
+using System.Trees;
 
 public sealed class TreeNodeParserResolver {
 	private readonly IReadOnlyList<ITreeNodeParser> parsers;

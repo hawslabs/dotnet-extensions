@@ -1,6 +1,6 @@
 namespace System.Trees.Parsing;
 
-using System.Trees.Nodes;
+using System.Trees;
 
 public interface ITreeNodeParser {
 	int Priority => 0;

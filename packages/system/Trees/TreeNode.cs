@@ -1,6 +1,6 @@
-namespace System.Trees.Nodes;
+namespace System.Trees;
 
-using Formatting;
+using System.Trees.Formatting;
 
 public record TreeNode(string Name) {
 	public virtual string? Icon { get; init; } = "📄";

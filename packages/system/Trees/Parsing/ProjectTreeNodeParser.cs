@@ -1,7 +1,7 @@
 namespace System.Trees.Parsing;
 
-using System.Trees.Nodes;
-using MSBuildNodes = System.Trees.Nodes.MSBuild;
+using System.Trees;
+using MSBuildNodes = System.Trees.MSBuild.Nodes;
 
 public sealed class ProjectTreeNodeParser : ITreeNodeParser {
 	private static readonly HashSet<string> ProjectExtensions = new(StringComparer.OrdinalIgnoreCase) {

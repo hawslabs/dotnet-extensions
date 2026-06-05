@@ -1,6 +1,6 @@
 namespace System.Trees.Formatting;
 
-using Nodes;
+using System.Trees;
 
 public interface ITreeNodeFormatter {
 	string Format(TreeNode root);

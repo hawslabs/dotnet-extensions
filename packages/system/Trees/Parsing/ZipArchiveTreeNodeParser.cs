@@ -1,7 +1,7 @@
 namespace System.Trees.Parsing;
 
-using System.Trees.Nodes;
-using ArchiveNodes = System.Trees.Nodes.Archive;
+using System.Trees;
+using ArchiveNodes = System.Trees.Archive.Nodes;
 
 public sealed class ZipArchiveTreeNodeParser : ITreeNodeParser {
 	public TreeNodeParserMatch Match(TreeNodeParseContext context) {

@@ -1,6 +1,6 @@
-namespace System.Trees.Nodes.NuGet;
+namespace System.Trees.NuGet.Nodes;
 
-using Archive;
+using System.Trees.Archive.Nodes;
 
 public sealed record NuGetPackageNode(
 	string PackageId,
