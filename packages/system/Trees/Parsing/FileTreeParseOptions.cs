@@ -9,6 +9,7 @@ public sealed record FileTreeParseOptions {
 	public bool ReadFileMetrics { get; init; } = true;
 	public bool IgnoreFileReadErrors { get; init; } = false;
 	public bool IgnoreFilesOutsideBasePath { get; init; } = false;
+	public IReadOnlyList<ITreeNodeParser> NodeParsers { get; init; } = TreeNodeParsers.Default;
 	public Func<string, IEnumerable<string>> ReadLines { get; init; } = File.ReadLines;
 	public Func<string, bool> LabelPredicate { get; init; }
 		= static line => line.TrimStart().StartsWith("label_", StringComparison.Ordinal);

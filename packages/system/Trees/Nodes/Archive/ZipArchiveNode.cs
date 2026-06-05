@@ -5,11 +5,7 @@ public record ZipArchiveNode(
 	string FullPath,
 	string RelativePath
 ) : TreeNode(File.Name) {
-	public static bool CanParse(FileInfo file) {
-		ArgumentNullException.ThrowIfNull(file);
-
-		return string.Equals(file.Extension, ".zip", StringComparison.OrdinalIgnoreCase);
-	}
+	public override string? Icon { get; init; } = "🗜️";
 
 	public static ZipArchiveNode Parse(FileInfo file, string relativePath) {
 		ArgumentNullException.ThrowIfNull(file);

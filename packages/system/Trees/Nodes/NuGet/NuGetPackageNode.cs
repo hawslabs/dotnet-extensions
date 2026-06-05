@@ -9,16 +9,7 @@ public sealed record NuGetPackageNode(
 	string FullPath,
 	string RelativePath
 ) : ZipArchiveNode(File, FullPath, RelativePath) {
-	private static readonly string[] PackageExtensions = [
-		".nupkg",
-		".snupkg",
-	];
-
-	public static new bool CanParse(FileInfo file) {
-		ArgumentNullException.ThrowIfNull(file);
-
-		return PackageExtensions.Contains(file.Extension, StringComparer.OrdinalIgnoreCase);
-	}
+	public override string? Icon { get; init; } = "📦";
 
 	public static new NuGetPackageNode Parse(FileInfo file, string relativePath) {
 		ArgumentNullException.ThrowIfNull(file);

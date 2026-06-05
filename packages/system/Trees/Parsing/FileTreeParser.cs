@@ -1,10 +1,6 @@
 namespace System.Trees.Parsing;
 
-using ArchiveNodes = System.Trees.Nodes.Archive;
 using FileSystemNodes = System.Trees.Nodes.FileSystem;
-using MSBuildNodes = System.Trees.Nodes.MSBuild;
-using NuGetNodes = System.Trees.Nodes.NuGet;
-using TreeNodes = System.Trees.Nodes;
 
 public static class FileTreeParser {
 	public static FileSystemNodes.FolderTreeNode Parse(IEnumerable<FileInfo> files, FileTreeParseOptions? options = null) {
@@ -24,6 +20,7 @@ public static class FileTreeParser {
 		var rootName = options.RootName ?? Path.GetFileNameOrPath(basePath);
 
 		var root = FileSystemNodes.FolderTreeNode.Parse(rootName);
+		var nodeParserResolver = new TreeNodeParserResolver(options.NodeParsers);
 
 		foreach (var file in files) {
 			if (options.IgnoreFilesOutsideBasePath && Path.IsOutsideBasePath(basePath, file.FullName, options.PathComparison)) {
@@ -43,31 +40,13 @@ public static class FileTreeParser {
 				folder = folder.GetOrAddFolder(part);
 			}
 
-			folder.AddOrUpdateNode(parts[^1], ParseNode(file, relativePath, options));
+			var context = new TreeNodeParseContext(file, relativePath, options);
+
+			folder.AddOrUpdateNode(parts[^1], nodeParserResolver.Parse(context));
 		}
 
 		root.ComputeTotals();
 
 		return new(basePath, root);
-	}
-
-	private static TreeNodes.TreeNode ParseNode(FileInfo file, string relativePath, FileTreeParseOptions options) {
-		if (NuGetNodes.NuGetPackageNode.CanParse(file)) {
-			return NuGetNodes.NuGetPackageNode.Parse(file, relativePath);
-		}
-
-		if (ArchiveNodes.ZipArchiveNode.CanParse(file)) {
-			return ArchiveNodes.ZipArchiveNode.Parse(file, relativePath);
-		}
-
-		if (MSBuildNodes.SolutionNode.CanParse(file)) {
-			return MSBuildNodes.SolutionNode.Parse(file, relativePath);
-		}
-
-		if (MSBuildNodes.ProjectNode.CanParse(file)) {
-			return MSBuildNodes.ProjectNode.Parse(file, relativePath);
-		}
-
-		return FileSystemNodes.FileTreeNode.Parse(file, relativePath, options);
 	}
 }

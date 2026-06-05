@@ -264,7 +264,7 @@ public sealed class AsciiTreeFormatter(
 
 	private string GetRootLeftText(TreeNode root) {
 		return options.ShowIcons
-			? options.DirectoryIcon + root.Name
+			? GetIcon(root) + root.Name
 			: root.Name;
 	}
 
@@ -273,9 +273,7 @@ public sealed class AsciiTreeFormatter(
 			return "";
 		}
 
-		return IsFileNode(node)
-			? options.FileIcon
-			: options.DirectoryIcon;
+		return node.Icon ?? "";
 	}
 
 	private static bool IsFileNode(TreeNode node) {

@@ -9,6 +9,8 @@ public sealed record FileTreeNode(
 	int LineCount = 0,
 	int LabelCount = 0
 ) : TreeNode(File.Name) {
+	public override string? Icon { get; init; } = "📄";
+
 	public static FileTreeNode Parse(FileInfo file, string relativePath, FileTreeParseOptions options) {
 		ArgumentNullException.ThrowIfNull(file);
 		ArgumentException.ThrowIfNullOrWhiteSpace(relativePath);

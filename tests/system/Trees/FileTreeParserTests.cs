@@ -4,6 +4,7 @@ using ArchiveNodes = System.Trees.Nodes.Archive;
 using FileSystemNodes = System.Trees.Nodes.FileSystem;
 using MSBuildNodes = System.Trees.Nodes.MSBuild;
 using NuGetNodes = System.Trees.Nodes.NuGet;
+using TreeNodes = System.Trees.Nodes;
 using System.Trees.Parsing;
 
 using FluentAssertions;
@@ -89,6 +90,46 @@ public sealed class FileTreeParserTests {
 	}
 
 	[Fact]
+	public void Parse_NodeParsersHaveSameSpecificityAndPriority_ThrowsAmbiguousParserMatch() {
+		using var temp = new TestDirectory();
+		var file = temp.CreateFile("src/App.txt");
+
+		var act = () => FileTreeParser.Parse(
+			[file],
+			new() {
+				BasePath = temp.Root.FullName,
+				NodeParsers = [
+					new TestTreeNodeParser("first parser", specificity: 100, priority: 0),
+					new TestTreeNodeParser("second parser", specificity: 100, priority: 0),
+				],
+			}
+		);
+
+		act.Should().Throw<InvalidOperationException>()
+			.WithMessage("*Ambiguous parser match*first parser*second parser*");
+	}
+
+	[Fact]
+	public void Parse_NodeParsersHaveSameSpecificityAndDifferentPriority_UsesHighestPriorityParser() {
+		using var temp = new TestDirectory();
+		var file = temp.CreateFile("src/App.txt");
+
+		var root = FileTreeParser.Parse(
+			[file],
+			new() {
+				BasePath = temp.Root.FullName,
+				NodeParsers = [
+					new TestTreeNodeParser("low priority parser", specificity: 100, priority: 0, nodeName: "low"),
+					new TestTreeNodeParser("high priority parser", specificity: 100, priority: 10, nodeName: "high"),
+				],
+			}
+		);
+
+		var src = root.Children["src"].Should().BeOfType<FileSystemNodes.FolderTreeNode>().Subject;
+		src.Children["App.txt"].Name.Should().Be("high");
+	}
+
+	[Fact]
 	public void Parse_ReadFileMetricsIsFalse_CreatesFilesWithZeroMetrics() {
 		using var temp = new TestDirectory();
 		temp.CreateFile("src/App.cs", "label_app\nConsole.WriteLine();");
@@ -162,5 +203,22 @@ public sealed class FileTreeParserTests {
 
 		sameFolder.Should().BeSameAs(folder);
 		root.Children.Values.Should().ContainSingle();
+	}
+
+	private sealed class TestTreeNodeParser(
+		string reason,
+		int specificity,
+		int priority,
+		string? nodeName = null
+	) : ITreeNodeParser {
+		public int Priority { get; } = priority;
+
+		public TreeNodeParserMatch Match(TreeNodeParseContext context) {
+			return new(true, specificity, reason);
+		}
+
+		public TreeNodes.TreeNode Parse(TreeNodeParseContext context) {
+			return TreeNodes.TreeNode.Parse(nodeName ?? context.File.Name);
+		}
 	}
 }

@@ -86,6 +86,38 @@ public sealed class AsciiTreeExtensionsTests {
 	}
 
 	[Fact]
+	public void ToAsciiTree_ShowIcons_UsesNodeIcons() {
+		using var temp = new TestDirectory();
+		temp.CreateFile("HawsLabs.Extensions.slnx");
+		temp.CreateFile("src/App/App.csproj");
+		temp.CreateFile("artifacts/HawsLabs.Extensions.System.1.2.3.nupkg");
+		temp.CreateFile("artifacts/build.zip");
+
+		var tree = temp.Root.GetFiles("*", SearchOption.AllDirectories).ToAsciiTree(new() {
+			ShowIcons = true,
+			ShowLabels = false,
+			ShowLineCounts = false,
+			AlignColumns = false,
+		});
+
+		tree.RootPath.Should().Be(temp.Root.FullName);
+		tree.Text.Value.Should().Be(
+			string.Join(
+				Environment.NewLine,
+				$"📁{Path.GetFileNameOrPath(temp.Root.FullName)}",
+				"├── 📁artifacts",
+				"│   ├── 🗜️build.zip",
+				"│   └── 📦HawsLabs.Extensions.System.1.2.3.nupkg",
+				"├── 📁src",
+				"│   └── 📁App",
+				"│       └── ⚙️App.csproj",
+				"└── 🧩HawsLabs.Extensions.slnx",
+				""
+			)
+		);
+	}
+
+	[Fact]
 	public void ToAsciiTree_ShowLabels_RendersLabelSection() {
 		using var temp = new TestDirectory();
 		temp.CreateFile("src/App.cs", "label_app\nConsole.WriteLine();");

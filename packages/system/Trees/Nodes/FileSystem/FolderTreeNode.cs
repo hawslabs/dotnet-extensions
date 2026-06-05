@@ -1,6 +1,8 @@
 namespace System.Trees.Nodes.FileSystem;
 
 public sealed record FolderTreeNode(string Name) : TreeNode(Name) {
+	public override string? Icon { get; init; } = "📁";
+
 	public int TotalLines { get; private set; }
 	public int TotalLabelCount { get; private set; }
 

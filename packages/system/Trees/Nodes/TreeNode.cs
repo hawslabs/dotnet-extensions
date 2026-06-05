@@ -3,6 +3,8 @@ namespace System.Trees.Nodes;
 using Formatting;
 
 public record TreeNode(string Name) {
+	public virtual string? Icon { get; init; } = "📄";
+
 	public OrderedDictionary<string, TreeNode> Children { get; } = new(StringComparer.OrdinalIgnoreCase);
 
 	public static TreeNode Parse(string name) {

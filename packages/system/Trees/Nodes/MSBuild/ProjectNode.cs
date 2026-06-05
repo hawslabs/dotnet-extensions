@@ -5,17 +5,7 @@ public sealed record ProjectNode(
 	string FullPath,
 	string RelativePath
 ) : TreeNode(File.Name) {
-	private static readonly string[] ProjectExtensions = [
-		".csproj",
-		".fsproj",
-		".vbproj",
-	];
-
-	public static bool CanParse(FileInfo file) {
-		ArgumentNullException.ThrowIfNull(file);
-
-		return ProjectExtensions.Contains(file.Extension, StringComparer.OrdinalIgnoreCase);
-	}
+	public override string? Icon { get; init; } = "⚙️";
 
 	public static ProjectNode Parse(FileInfo file, string relativePath) {
 		ArgumentNullException.ThrowIfNull(file);
