@@ -14,28 +14,42 @@ public static class FileInfoEnumerableExtensions {
 		/// Returns the current directory when <paramref name="files" /> is empty.
 		/// </remarks>
 		public string FindCommonBasePath(StringComparison comparison) {
-			using var enumerator = files.GetEnumerator();
+			var common = files
+				.Select(file => new DirectoryInfo(
+					Path.GetDirectoryName(file.FullName) ?? Directory.GetCurrentDirectory()
+				))
+				.FindCommonAncestor(
+					static directory => directory.Parent,
+					new DirectoryInfoSegmentComparer(StringComparer.FromComparison(comparison))
+				);
 
-			if (!enumerator.MoveNext()) {
-				return Directory.GetCurrentDirectory();
+			return common?.FullName ?? Directory.GetCurrentDirectory();
+		}
+	}
+
+	private sealed class DirectoryInfoSegmentComparer(
+		StringComparer segmentComparer
+	) : IEqualityComparer<DirectoryInfo> {
+		public bool Equals(DirectoryInfo? x, DirectoryInfo? y) {
+			if (ReferenceEquals(x, y)) {
+				return true;
 			}
 
-			var common = Path.GetDirectoryName(enumerator.Current.FullName) ?? Directory.GetCurrentDirectory();
-
-			while (enumerator.MoveNext()) {
-				var directory = Path.GetDirectoryName(enumerator.Current.FullName) ?? Directory.GetCurrentDirectory();
-
-				while (!Path.IsSameOrChildPath(directory, common, comparison)) {
-					var parent = Directory.GetParent(common);
-					if (parent is null) {
-						return common;
-					}
-
-					common = parent.FullName;
-				}
+			if (x is null || y is null) {
+				return false;
 			}
 
-			return common;
+			return x.GetSegments().SequenceEqual(y.GetSegments(), segmentComparer);
+		}
+
+		public int GetHashCode(DirectoryInfo obj) {
+			var hash = new HashCode();
+
+			foreach (var segment in obj.GetSegments()) {
+				hash.Add(segment, segmentComparer);
+			}
+
+			return hash.ToHashCode();
 		}
 	}
 }

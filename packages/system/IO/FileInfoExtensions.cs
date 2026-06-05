@@ -6,6 +6,17 @@ namespace System.IO;
 public static class FileInfoExtensions {
 	extension(FileInfo file) {
 		/// <summary>
+		/// Gets the path segments from the file's full path.
+		/// </summary>
+		/// <returns>The file path segments.</returns>
+		public string[] GetSegments() {
+			return file.FullName.Split(
+				[Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar],
+				StringSplitOptions.RemoveEmptyEntries
+			);
+		}
+
+		/// <summary>
 		/// Gets a relative path to the file with directory separators normalized to forward slashes.
 		/// </summary>
 		/// <param name="basePath">The base path used to calculate the relative path.</param>
