@@ -1,6 +1,7 @@
-namespace System.Trees.Parsing;
+namespace System.Trees.NuGet.Parsing;
 
 using System.Trees;
+using System.Trees.FileSystem.Parsing;
 using NuGetNodes = System.Trees.NuGet.Nodes;
 
 public sealed class NuGetPackageTreeNodeParser : ITreeNodeParser {

@@ -1,6 +1,7 @@
-namespace System.Trees.Parsing;
+namespace System.Trees.MSBuild.Parsing;
 
 using System.Trees;
+using System.Trees.FileSystem.Parsing;
 using MSBuildNodes = System.Trees.MSBuild.Nodes;
 
 public sealed class SolutionTreeNodeParser : ITreeNodeParser {

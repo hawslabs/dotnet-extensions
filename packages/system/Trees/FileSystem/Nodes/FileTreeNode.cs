@@ -1,7 +1,7 @@
 namespace System.Trees.FileSystem.Nodes;
 
 using System.Trees;
-using System.Trees.Parsing;
+using System.Trees.FileSystem.Parsing;
 
 public sealed record FileTreeNode(
 	FileInfo File,

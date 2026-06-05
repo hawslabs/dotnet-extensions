@@ -1,4 +1,4 @@
-namespace System.Trees.Parsing;
+namespace System.Trees.FileSystem.Parsing;
 
 public static class TreeNodeParserSpecificity {
 	public const int Fallback = 0;

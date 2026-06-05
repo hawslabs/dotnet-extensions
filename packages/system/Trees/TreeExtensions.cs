@@ -2,7 +2,7 @@ namespace System.Trees;
 
 using FileSystemNodes = System.Trees.FileSystem.Nodes;
 
-using Parsing;
+using System.Trees.FileSystem.Parsing;
 
 public static class TreeExtensions {
 	extension(IEnumerable<FileInfo> paths) {

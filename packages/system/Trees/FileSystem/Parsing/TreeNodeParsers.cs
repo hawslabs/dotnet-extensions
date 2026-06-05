@@ -1,4 +1,8 @@
-namespace System.Trees.Parsing;
+namespace System.Trees.FileSystem.Parsing;
+
+using System.Trees.Archive.Parsing;
+using System.Trees.MSBuild.Parsing;
+using System.Trees.NuGet.Parsing;
 
 public static class TreeNodeParsers {
 	private static readonly ITreeNodeParser[] defaultParsers = [

@@ -1,6 +1,7 @@
-namespace System.Trees.Parsing;
+namespace System.Trees.Archive.Parsing;
 
 using System.Trees;
+using System.Trees.FileSystem.Parsing;
 using ArchiveNodes = System.Trees.Archive.Nodes;
 
 public sealed class ZipArchiveTreeNodeParser : ITreeNodeParser {

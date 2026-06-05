@@ -5,7 +5,7 @@ using FileSystemNodes = System.Trees.FileSystem.Nodes;
 using MSBuildNodes = System.Trees.MSBuild.Nodes;
 using NuGetNodes = System.Trees.NuGet.Nodes;
 using TreeNodes = System.Trees;
-using System.Trees.Parsing;
+using System.Trees.FileSystem.Parsing;
 
 using FluentAssertions;
 

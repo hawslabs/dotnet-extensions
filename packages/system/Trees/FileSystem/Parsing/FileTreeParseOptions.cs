@@ -1,4 +1,4 @@
-namespace System.Trees.Parsing;
+namespace System.Trees.FileSystem.Parsing;
 
 public sealed record FileTreeParseOptions {
 	public string? BasePath { get; init; }

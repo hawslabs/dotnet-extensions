@@ -1,6 +1,6 @@
 namespace System.Trees.FileSystem;
 
-using System.Trees.Parsing;
+using System.Trees.FileSystem.Parsing;
 
 public static class FileTreeExtensions {
 	extension(IEnumerable<FileInfo> files) {

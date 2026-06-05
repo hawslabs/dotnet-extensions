@@ -4,7 +4,7 @@
   <Namespace>System.Trees.Formatting</Namespace>
   <Namespace>System.Trees.Formatting.Ascii</Namespace>
   <Namespace>System.Trees</Namespace>
-  <Namespace>System.Trees.Parsing</Namespace>
+  <Namespace>System.Trees.FileSystem.Parsing</Namespace>
 </Query>
 
 void Main() {

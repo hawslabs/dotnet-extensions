@@ -1,4 +1,4 @@
-namespace System.Trees.Parsing;
+namespace System.Trees.FileSystem.Parsing;
 
 public readonly record struct TreeNodeParserMatch(
 	bool IsMatch,

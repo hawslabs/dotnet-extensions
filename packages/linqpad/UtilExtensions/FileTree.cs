@@ -1,5 +1,5 @@
 using System.Trees.FileSystem;
-using System.Trees.Parsing;
+using System.Trees.FileSystem.Parsing;
 using JetBrains.Annotations;
 
 [UsedImplicitly(Reason = "Used by LINQPad sample queries.")]
